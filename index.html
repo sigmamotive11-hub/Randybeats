@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RANDYBEATS | Premium Instrumentals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdA9_iV1iAS2sxMJZCT3-Bx1xpdF5U7N2oQalAkZnCjX7BtlAdfpfDl3KHuvW9gQkUeGHoaO0vMcYm11&currency=USD"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Inter', sans-serif; background: #0B0C10; color: #E0E0E0; }
@@ -18,6 +18,7 @@
         audio { width: 100%; border-radius: 60px; background: #1A1E2A; }
         .wave-group { display: flex; gap: 3px; height: 32px; justify-content: center; }
         .wave-bar { width: 3px; background: linear-gradient(to top, #00E5FF, #B026FF); border-radius: 2px; }
+        .debug-link { font-size: 10px; word-break: break-all; color: #888; margin-top: 4px; }
     </style>
 </head>
 <body>
@@ -47,7 +48,7 @@
     <div id="emptyState" class="hidden text-center py-20 glass-card p-12">No beats yet. Add via admin.</div>
 </main>
 
-<!-- ADMIN MODAL -->
+<!-- ADMIN MODAL (same as before) -->
 <div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
     <div class="w-full max-w-2xl rounded-3xl bg-black/90 border border-cyan-500/30 p-6">
         <div id="loginScreen">
@@ -63,19 +64,19 @@
             <form id="beatForm" class="space-y-4">
                 <input type="text" id="beatTitle" placeholder="Beat Title" class="w-full bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white">
                 <div class="grid grid-cols-2 gap-3">
-                    <input type="text" id="beatGenre" placeholder="Genre">
-                    <input type="number" id="beatBpm" placeholder="BPM">
+                    <input type="text" id="beatGenre" placeholder="Genre" class="bg-black/40 rounded-xl p-3">
+                    <input type="number" id="beatBpm" placeholder="BPM" class="bg-black/40 rounded-xl p-3">
                 </div>
                 <input type="number" id="beatPrice" placeholder="Price USD" step="0.01" class="w-full bg-black/40 rounded-xl p-3">
                 
-                <!-- AUDIO FILENAME (not URL) -->
+                <!-- AUDIO FILENAME -->
                 <div>
                     <label class="text-xs text-gray-400">Audio filename in B2 bucket (e.g., beat123.mp3)</label>
                     <input type="text" id="beatAudioFilename" placeholder="filename.mp3" class="w-full bg-black/40 border border-cyan-500/30 rounded-xl p-3 text-white">
                     <p class="text-[10px] text-gray-500 mt-1">File must already exist in your 'randybeats' bucket.</p>
                 </div>
 
-                <!-- COVER UPLOAD (optional) -->
+                <!-- COVER UPLOAD -->
                 <div>
                     <label class="text-xs text-gray-400">Cover art (optional)</label>
                     <div id="coverUploadZone" class="upload-zone p-3 text-center">
@@ -97,58 +98,66 @@
 </div>
 
 <script>
-    // ========== YOUR BACKBLAZE CREDENTIALS (EMBEDDED) ==========
+    // ========== YOUR BACKBLAZE CREDENTIALS ==========
     const B2_KEY_ID = "003b1181fb58a820000000001";
     const B2_APP_KEY = "K003c3cZuuAr6jFDR5+HG8256evJbao";
     const B2_BUCKET_NAME = "randybeats";
     const B2_ENDPOINT = "https://s3.eu-central-003.backblazeb2.com";
     const B2_PUBLIC_URL_BASE = `${B2_ENDPOINT}/${B2_BUCKET_NAME}`;
-
     const ADMIN_PASSWORD = "Z7@qL9!vR2#pXr8$T4^mK6&cN1*HsW3";
 
     let beats = JSON.parse(localStorage.getItem('randybeats_data') || '[]');
     let b2AuthToken = null;
     let b2ApiUrl = null;
-    let b2DownloadAuthToken = null; // for signed URLs
+    let b2BucketId = null;
 
-    // Authenticate with B2 using your keys
+    // Authenticate with B2
     async function b2Authenticate() {
         const credentials = btoa(`${B2_KEY_ID}:${B2_APP_KEY}`);
         const res = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
             headers: { 'Authorization': `Basic ${credentials}` }
         });
-        if (!res.ok) throw new Error('B2 auth failed');
+        if (!res.ok) throw new Error('B2 auth failed: ' + res.status);
         const data = await res.json();
         b2AuthToken = data.authorizationToken;
         b2ApiUrl = data.apiUrl;
+        b2BucketId = data.allowed.bucketId;
+        console.log("✅ B2 authenticated, bucketId:", b2BucketId);
         return data;
     }
 
-    // Get a download authorization (signed URL) for a specific file
-    async function getSignedAudioUrl(fileName) {
+    // Get signed URL for a specific file (or fallback to public)
+    async function getAudioUrl(fileName) {
         try {
             if (!b2AuthToken) await b2Authenticate();
+            console.log(`🔐 Getting signed URL for: ${fileName}`);
             const res = await fetch(`${b2ApiUrl}/b2api/v2/b2_get_download_authorization`, {
                 method: 'POST',
                 headers: { 'Authorization': b2AuthToken, 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    bucketId: (await b2Authenticate()).allowed.bucketId,
+                    bucketId: b2BucketId,
                     fileNamePrefix: fileName,
-                    validDurationInSeconds: 86400 // 24 hours
+                    validDurationInSeconds: 3600 // 1 hour
                 })
             });
-            if (!res.ok) throw new Error('Failed to get download auth');
+            if (!res.ok) {
+                const errText = await res.text();
+                console.warn(`⚠️ Signed URL failed (${res.status}): ${errText}. Falling back to public URL.`);
+                return `${B2_PUBLIC_URL_BASE}/${encodeURIComponent(fileName)}`;
+            }
             const data = await res.json();
-            const downloadUrl = `${B2_PUBLIC_URL_BASE}/${fileName}?Authorization=${data.authorizationToken}`;
-            return downloadUrl;
+            const signedUrl = `${B2_PUBLIC_URL_BASE}/${encodeURIComponent(fileName)}?Authorization=${data.authorizationToken}`;
+            console.log(`✅ Signed URL generated: ${signedUrl.substring(0, 100)}...`);
+            return signedUrl;
         } catch (err) {
-            console.error("Signed URL error:", err);
-            // Fallback to public URL (if bucket is public)
-            return `${B2_PUBLIC_URL_BASE}/${fileName}`;
+            console.error("❌ Signed URL error:", err);
+            const publicUrl = `${B2_PUBLIC_URL_BASE}/${encodeURIComponent(fileName)}`;
+            console.log(`🔄 Using public fallback: ${publicUrl}`);
+            return publicUrl;
         }
     }
 
-    // Render store with signed audio URLs
+    // Render store
     async function renderStore() {
         const container = document.getElementById('beatsGrid');
         const emptyDiv = document.getElementById('emptyState');
@@ -161,17 +170,15 @@
         emptyDiv.classList.add('hidden');
         document.getElementById('beatCount').innerText = beats.length;
 
-        // Generate signed URLs for all beats (async)
+        // Generate audio URLs for all beats
         for (let beat of beats) {
-            if (beat.audioFilename && !beat._signedUrl) {
-                try {
-                    beat._signedUrl = await getSignedAudioUrl(beat.audioFilename);
-                } catch(e) { beat._signedUrl = null; }
+            if (beat.audioFilename && !beat._audioUrl) {
+                beat._audioUrl = await getAudioUrl(beat.audioFilename);
             }
         }
 
         container.innerHTML = beats.map(beat => `
-            <div class="glass-card p-5 beat-card">
+            <div class="glass-card p-5 beat-card" data-id="${beat.id}">
                 ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img mb-4" onerror="this.src='https://placehold.co/400x200/1a1a2e/cyan?text=🎵'">` : `<div class="h-48 rounded-2xl bg-gray-800 flex items-center justify-center mb-4 text-4xl">🎧</div>`}
                 <div class="flex justify-between">
                     <div><h3 class="text-xl font-bold">${escapeHtml(beat.title)}</h3><p class="text-cyan-300 text-sm">${beat.genre} • ${beat.bpm} BPM</p></div>
@@ -179,23 +186,36 @@
                 </div>
                 <div class="wave-group my-3" id="wave-${beat.id}">${Array(6).fill().map(() => `<div class="wave-bar" style="height: ${12+Math.random()*18}px"></div>`).join('')}</div>
                 <audio id="audio-${beat.id}" controls class="w-full my-2" preload="metadata">
-                    <source src="${beat._signedUrl || ''}" type="audio/mpeg">
+                    <source src="${beat._audioUrl || ''}" type="audio/mpeg">
                     Your browser does not support audio.
                 </audio>
                 <div id="audioError-${beat.id}" class="text-red-400 text-xs hidden"></div>
+                <div class="debug-link">File: ${beat.audioFilename}</div>
                 <button onclick="togglePlayPause('${beat.id}')" id="playbtn-${beat.id}" class="w-full mt-2 btn-outline border border-cyan-500 text-cyan-300 py-2 rounded-xl">▶ PLAY</button>
                 <div id="paypal-${beat.id}" class="mt-3"></div>
             </div>
         `).join('');
 
+        // Attach event listeners and PayPal
         beats.forEach(beat => {
             const audio = document.getElementById(`audio-${beat.id}`);
             if (audio) {
-                audio.onerror = () => {
-                    document.getElementById(`audioError-${beat.id}`).innerText = '❌ Cannot load audio. Check filename or bucket permissions.';
+                audio.onerror = (e) => {
+                    console.error(`❌ Audio error for ${beat.title}:`, audio.error);
+                    let msg = "Cannot play audio. ";
+                    if (audio.error?.code === 4) msg += "Media not supported (codec?).";
+                    else if (audio.error?.code === 3) msg += "Decoding error.";
+                    else msg += `HTTP error? Check console. URL: ${beat._audioUrl}`;
+                    document.getElementById(`audioError-${beat.id}`).innerText = msg;
                     document.getElementById(`audioError-${beat.id}`).classList.remove('hidden');
                 };
-                audio.oncanplay = () => document.getElementById(`audioError-${beat.id}`)?.classList.add('hidden');
+                audio.oncanplay = () => {
+                    document.getElementById(`audioError-${beat.id}`)?.classList.add('hidden');
+                };
+                // Log when audio loads successfully
+                audio.addEventListener('loadedmetadata', () => {
+                    console.log(`✅ Audio loaded: ${beat.title}, duration: ${audio.duration}s`);
+                });
             }
             renderPayPal(beat);
         });
@@ -203,8 +223,11 @@
 
     function togglePlayPause(id) {
         const audio = document.getElementById(`audio-${id}`);
-        if (audio.paused) audio.play().catch(e => console.warn);
-        else audio.pause();
+        if (audio.paused) {
+            audio.play().catch(err => console.warn("Play failed:", err));
+        } else {
+            audio.pause();
+        }
         audio.onplay = () => document.getElementById(`playbtn-${id}`).innerText = '⏸ PAUSE';
         audio.onpause = () => document.getElementById(`playbtn-${id}`).innerText = '▶ PLAY';
     }
@@ -221,13 +244,13 @@
         }).render(container);
     }
 
-    // Admin: handle cover upload to B2 (same as before but simplified)
+    // Cover upload to B2 (same as before)
     async function uploadCoverToB2(file) {
-        const auth = await b2Authenticate();
+        await b2Authenticate();
         const uploadUrlRes = await fetch(`${b2ApiUrl}/b2api/v2/b2_get_upload_url`, {
             method: 'POST',
             headers: { 'Authorization': b2AuthToken },
-            body: JSON.stringify({ bucketId: auth.allowed.bucketId })
+            body: JSON.stringify({ bucketId: b2BucketId })
         });
         const { uploadUrl, authorizationToken } = await uploadUrlRes.json();
         const fileName = `covers/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '-')}`;
@@ -248,7 +271,7 @@
         return `${B2_PUBLIC_URL_BASE}/${fileName}`;
     }
 
-    // Admin form handling
+    // Admin form submit
     document.getElementById('beatForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const id = document.getElementById('beatId').value || Date.now().toString();
@@ -272,7 +295,7 @@
         localStorage.setItem('randybeats_data', JSON.stringify(beats));
         resetAdminForm();
         closeAdminModal();
-        await renderStore();
+        await renderStore(); // re-render with fresh URLs
     });
 
     // Cover upload handler
@@ -351,7 +374,8 @@
     }
     function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m];}); }
 
-    renderStore();
+    // Initial render
+    renderStore().catch(console.error);
     document.getElementById('adminModal').addEventListener('click', (e) => { if (e.target === document.getElementById('adminModal')) closeAdminModal(); });
 </script>
 </body>
