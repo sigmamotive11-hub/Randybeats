@@ -15,16 +15,34 @@
         }
         body {
             font-family: 'Inter', sans-serif;
-            background: #0a0a0a;
             color: #e5e5e5;
             min-height: 100vh;
             overflow-x: hidden;
+            position: relative;
         }
-        /* premium dark gradient */
-        .premium-gradient {
-            background: radial-gradient(circle at 10% 20%, #1a1a1a, #000000);
+        /* Full-screen background image with overlay */
+        .bg-image {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop'); /* HD music / vinyl / warm tones */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
-        /* glassmorphic card with gold accent */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: -1;
+        }
+        /* Glassmorphic card with gold accent */
         .beat-card {
             background: rgba(20, 20, 25, 0.65);
             backdrop-filter: blur(14px);
@@ -158,204 +176,206 @@
         }
     </style>
 </head>
-<body class="premium-gradient">
+<body>
+    <div class="bg-image"></div>
+    <div class="overlay"></div>
 
-<div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-14 flex-wrap gap-4">
-        <div>
-            <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight">
-                <span class="bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent">RANDYBEATS</span>
-            </h1>
-            <p class="text-gray-400 text-sm mt-1">premium instrumentals · wav format</p>
+    <div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-14 flex-wrap gap-4">
+            <div>
+                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight">
+                    <span class="bg-gradient-to-r from-yellow-400 to-amber-600 bg-clip-text text-transparent">RANDYBEATS</span>
+                </h1>
+                <p class="text-gray-300 text-sm mt-1">premium instrumentals · wav format</p>
+            </div>
+            <a href="admin.html" class="admin-btn text-sm transition">🔐 Admin Panel</a>
         </div>
-        <a href="admin.html" class="admin-btn text-sm transition">🔐 Admin Panel</a>
+
+        <!-- Beats Grid -->
+        <div id="beatsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+        <div id="loading" class="text-center text-gray-400 py-24 text-lg">Loading beats...</div>
     </div>
 
-    <!-- Beats Grid -->
-    <div id="beatsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    <div id="loading" class="text-center text-gray-500 py-24 text-lg">Loading beats...</div>
-</div>
+    <script>
+        const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
+        const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
 
-<script>
-    const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
-    const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
+        let activeAudio = null;
+        let activeInterval = null;
+        let activeBeatId = null;
 
-    let activeAudio = null;
-    let activeInterval = null;
-    let activeBeatId = null;
-
-    async function loadBeats() {
-        try {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            const beats = data.record || [];
-            renderStore(beats);
-        } catch (err) {
-            document.getElementById('loading').innerHTML = 'Failed to load beats.<br>' + err.message;
-        }
-    }
-
-    function renderStore(beats) {
-        const grid = document.getElementById('beatsGrid');
-        const loadingDiv = document.getElementById('loading');
-        loadingDiv.style.display = 'none';
-        if (!beats.length) {
-            grid.innerHTML = '<div class="col-span-full text-center text-gray-500 py-16">✨ No beats yet — add some in the admin panel.</div>';
-            return;
-        }
-        grid.innerHTML = beats.map(beat => `
-            <div class="beat-card">
-                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img" onerror="this.src='https://placehold.co/600x400/1a1a1a/white?text=🎵'">` : `<div class="placeholder-cover">🎧</div>`}
-                <div class="p-5">
-                    <div class="flex justify-between items-start gap-3">
-                        <div>
-                            <h3 class="text-xl font-bold tracking-tight">${escapeHtml(beat.title)}</h3>
-                            <div class="flex items-center gap-2 mt-2">
-                                <span class="genre-badge">${escapeHtml(beat.genre)}</span>
-                                <span class="text-sm text-amber-300 font-medium">${beat.bpm} BPM</span>
-                            </div>
-                        </div>
-                        <span class="price">$${beat.price}</span>
-                    </div>
-                    <div class="mt-5">
-                        <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">
-                            <span class="play-icon">▶</span> 30s Preview
-                        </button>
-                        <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
-                        <div id="time-${beat.id}" class="time-text">0:00 / 0:30</div>
-                        <div id="error-${beat.id}" class="error-msg hidden"></div>
-                    </div>
-                    <div id="paypal-${beat.id}" class="mt-5"></div>
-                </div>
-            </div>
-        `).join('');
-
-        document.querySelectorAll('.preview-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id');
-                const url = btn.getAttribute('data-url');
-                togglePreview(id, url);
-            });
-        });
-
-        beats.forEach(beat => {
-            if (window.paypal) {
-                paypal.Buttons({
-                    createOrder: (data, actions) => actions.order.create({
-                        purchase_units: [{ amount: { value: beat.price, currency: "USD" }, description: beat.title }]
-                    }),
-                    onApprove: () => alert("✅ Purchase complete! You'll receive the full WAV download link via email.")
-                }).render(`#paypal-${beat.id}`);
+        async function loadBeats() {
+            try {
+                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
+                });
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                const beats = data.record || [];
+                renderStore(beats);
+            } catch (err) {
+                document.getElementById('loading').innerHTML = 'Failed to load beats.<br>' + err.message;
             }
-        });
-    }
-
-    function togglePreview(beatId, audioUrl) {
-        if (activeBeatId === beatId && activeAudio && !activeAudio.paused) {
-            stopPreview();
-            return;
         }
-        stopPreview();
 
-        const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
-        const progressFill = document.getElementById(`progress-${beatId}`);
-        const timeDisplay = document.getElementById(`time-${beatId}`);
-        const errorDiv = document.getElementById(`error-${beatId}`);
+        function renderStore(beats) {
+            const grid = document.getElementById('beatsGrid');
+            const loadingDiv = document.getElementById('loading');
+            loadingDiv.style.display = 'none';
+            if (!beats.length) {
+                grid.innerHTML = '<div class="col-span-full text-center text-gray-400 py-16">✨ No beats yet — add some in the admin panel.</div>';
+                return;
+            }
+            grid.innerHTML = beats.map(beat => `
+                <div class="beat-card">
+                    ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img" onerror="this.src='https://placehold.co/600x400/1a1a1a/white?text=🎵'">` : `<div class="placeholder-cover">🎧</div>`}
+                    <div class="p-5">
+                        <div class="flex justify-between items-start gap-3">
+                            <div>
+                                <h3 class="text-xl font-bold tracking-tight">${escapeHtml(beat.title)}</h3>
+                                <div class="flex items-center gap-2 mt-2">
+                                    <span class="genre-badge">${escapeHtml(beat.genre)}</span>
+                                    <span class="text-sm text-amber-300 font-medium">${beat.bpm} BPM</span>
+                                </div>
+                            </div>
+                            <span class="price">$${beat.price}</span>
+                        </div>
+                        <div class="mt-5">
+                            <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">
+                                <span class="play-icon">▶</span> 30s Preview
+                            </button>
+                            <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
+                            <div id="time-${beat.id}" class="time-text">0:00 / 0:30</div>
+                            <div id="error-${beat.id}" class="error-msg hidden"></div>
+                        </div>
+                        <div id="paypal-${beat.id}" class="mt-5"></div>
+                    </div>
+                </div>
+            `).join('');
 
-        btn.innerHTML = '<span>⏳</span> Loading...';
-        btn.disabled = true;
-        errorDiv.classList.add('hidden');
+            document.querySelectorAll('.preview-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = btn.getAttribute('data-id');
+                    const url = btn.getAttribute('data-url');
+                    togglePreview(id, url);
+                });
+            });
 
-        const audio = new Audio();
-        audio.src = audioUrl;
-        audio.crossOrigin = "Anonymous";
+            beats.forEach(beat => {
+                if (window.paypal) {
+                    paypal.Buttons({
+                        createOrder: (data, actions) => actions.order.create({
+                            purchase_units: [{ amount: { value: beat.price, currency: "USD" }, description: beat.title }]
+                        }),
+                        onApprove: () => alert("✅ Purchase complete! You'll receive the full WAV download link via email.")
+                    }).render(`#paypal-${beat.id}`);
+                }
+            });
+        }
 
-        let maxDuration = 30;
-        let interval = null;
+        function togglePreview(beatId, audioUrl) {
+            if (activeBeatId === beatId && activeAudio && !activeAudio.paused) {
+                stopPreview();
+                return;
+            }
+            stopPreview();
 
-        audio.addEventListener('loadedmetadata', () => {
-            maxDuration = Math.min(audio.duration, 30);
-            audio.currentTime = 0;
-            audio.play().then(() => {
-                btn.innerHTML = '<span>⏸</span> Pause';
-                btn.disabled = false;
-                btn.classList.add('playing');
-                activeAudio = audio;
-                activeBeatId = beatId;
+            const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
+            const progressFill = document.getElementById(`progress-${beatId}`);
+            const timeDisplay = document.getElementById(`time-${beatId}`);
+            const errorDiv = document.getElementById(`error-${beatId}`);
 
-                interval = setInterval(() => {
-                    if (audio.paused) {
-                        clearInterval(interval);
-                        btn.innerHTML = '<span>▶</span> 30s Preview';
-                        btn.classList.remove('playing');
-                        progressFill.style.width = '0%';
-                        timeDisplay.textContent = '0:00 / 0:30';
-                        activeAudio = null;
-                        activeBeatId = null;
-                        return;
-                    }
-                    if (audio.currentTime >= maxDuration) {
-                        audio.pause();
-                        audio.currentTime = 0;
-                        clearInterval(interval);
-                        btn.innerHTML = '<span>▶</span> 30s Preview';
-                        btn.classList.remove('playing');
-                        progressFill.style.width = '0%';
-                        timeDisplay.textContent = '0:00 / 0:30';
-                        activeAudio = null;
-                        activeBeatId = null;
-                    } else {
-                        const percent = (audio.currentTime / maxDuration) * 100;
-                        progressFill.style.width = percent + '%';
-                        const currentSec = Math.floor(audio.currentTime);
-                        timeDisplay.textContent = `${Math.floor(currentSec/60)}:${(currentSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`;
-                    }
-                }, 200);
-            }).catch(err => {
+            btn.innerHTML = '<span>⏳</span> Loading...';
+            btn.disabled = true;
+            errorDiv.classList.add('hidden');
+
+            const audio = new Audio();
+            audio.src = audioUrl;
+            audio.crossOrigin = "Anonymous";
+
+            let maxDuration = 30;
+            let interval = null;
+
+            audio.addEventListener('loadedmetadata', () => {
+                maxDuration = Math.min(audio.duration, 30);
+                audio.currentTime = 0;
+                audio.play().then(() => {
+                    btn.innerHTML = '<span>⏸</span> Pause';
+                    btn.disabled = false;
+                    btn.classList.add('playing');
+                    activeAudio = audio;
+                    activeBeatId = beatId;
+
+                    interval = setInterval(() => {
+                        if (audio.paused) {
+                            clearInterval(interval);
+                            btn.innerHTML = '<span>▶</span> 30s Preview';
+                            btn.classList.remove('playing');
+                            progressFill.style.width = '0%';
+                            timeDisplay.textContent = '0:00 / 0:30';
+                            activeAudio = null;
+                            activeBeatId = null;
+                            return;
+                        }
+                        if (audio.currentTime >= maxDuration) {
+                            audio.pause();
+                            audio.currentTime = 0;
+                            clearInterval(interval);
+                            btn.innerHTML = '<span>▶</span> 30s Preview';
+                            btn.classList.remove('playing');
+                            progressFill.style.width = '0%';
+                            timeDisplay.textContent = '0:00 / 0:30';
+                            activeAudio = null;
+                            activeBeatId = null;
+                        } else {
+                            const percent = (audio.currentTime / maxDuration) * 100;
+                            progressFill.style.width = percent + '%';
+                            const currentSec = Math.floor(audio.currentTime);
+                            timeDisplay.textContent = `${Math.floor(currentSec/60)}:${(currentSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`;
+                        }
+                    }, 200);
+                }).catch(err => {
+                    btn.innerHTML = '<span>▶</span> 30s Preview';
+                    btn.disabled = false;
+                    errorDiv.textContent = '❌ Cannot play audio. Check URL or CORS.';
+                    errorDiv.classList.remove('hidden');
+                });
+            });
+
+            audio.onerror = () => {
                 btn.innerHTML = '<span>▶</span> 30s Preview';
                 btn.disabled = false;
-                errorDiv.textContent = '❌ Cannot play audio. Check URL or CORS.';
+                errorDiv.textContent = '❌ Failed to load audio. Invalid URL or CORS.';
                 errorDiv.classList.remove('hidden');
-            });
-        });
-
-        audio.onerror = () => {
-            btn.innerHTML = '<span>▶</span> 30s Preview';
-            btn.disabled = false;
-            errorDiv.textContent = '❌ Failed to load audio. Invalid URL or CORS.';
-            errorDiv.classList.remove('hidden');
-        };
-    }
-
-    function stopPreview() {
-        if (activeAudio) {
-            activeAudio.pause();
-            activeAudio.currentTime = 0;
-            if (activeInterval) clearInterval(activeInterval);
-            const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`);
-            if (oldBtn) {
-                oldBtn.innerHTML = '<span>▶</span> 30s Preview';
-                oldBtn.classList.remove('playing');
-            }
-            const oldProgress = document.getElementById(`progress-${activeBeatId}`);
-            if (oldProgress) oldProgress.style.width = '0%';
-            const oldTime = document.getElementById(`time-${activeBeatId}`);
-            if (oldTime) oldTime.textContent = '0:00 / 0:30';
-            activeAudio = null;
-            activeBeatId = null;
+            };
         }
-    }
 
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-    }
+        function stopPreview() {
+            if (activeAudio) {
+                activeAudio.pause();
+                activeAudio.currentTime = 0;
+                if (activeInterval) clearInterval(activeInterval);
+                const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`);
+                if (oldBtn) {
+                    oldBtn.innerHTML = '<span>▶</span> 30s Preview';
+                    oldBtn.classList.remove('playing');
+                }
+                const oldProgress = document.getElementById(`progress-${activeBeatId}`);
+                if (oldProgress) oldProgress.style.width = '0%';
+                const oldTime = document.getElementById(`time-${activeBeatId}`);
+                if (oldTime) oldTime.textContent = '0:00 / 0:30';
+                activeAudio = null;
+                activeBeatId = null;
+            }
+        }
 
-    loadBeats();
-</script>
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+        }
+
+        loadBeats();
+    </script>
 </body>
 </html>
