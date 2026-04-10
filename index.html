@@ -9,11 +9,13 @@
         body { background: #0a0a0a; color: white; font-family: 'Inter', sans-serif; }
         .glass-card { background: rgba(20,20,40,0.8); backdrop-filter: blur(10px); border-radius: 24px; padding: 1.5rem; border: 1px solid #00e5ff30; transition: 0.3s; }
         .glass-card:hover { transform: translateY(-5px); border-color: #00e5ff; }
-        .preview-btn { background: #1a1a2e; border: 1px solid #00e5ff; border-radius: 40px; padding: 8px 20px; font-weight: bold; transition: 0.2s; cursor: pointer; }
+        .preview-btn { background: #1a1a2e; border: 1px solid #00e5ff; border-radius: 40px; padding: 8px 20px; font-weight: bold; transition: 0.2s; cursor: pointer; width: 100%; }
         .preview-btn:hover { background: #00e5ff20; }
+        .preview-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .preview-progress { width: 100%; height: 4px; background: #333; border-radius: 4px; margin: 8px 0; overflow: hidden; }
         .preview-progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #00e5ff, #b026ff); transition: width 0.1s linear; }
         .preview-time { font-size: 11px; color: #aaa; text-align: right; margin-top: 2px; }
+        .error-msg { font-size: 11px; color: #ff8888; margin-top: 4px; text-align: center; }
     </style>
 </head>
 <body class="p-6">
@@ -30,9 +32,8 @@
     const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
     const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
 
-    // Store active audio instances to prevent multiple playing at once
     let activeAudio = null;
-    let activeProgressInterval = null;
+    let activeInterval = null;
 
     async function loadBeats() {
         try {
@@ -63,17 +64,26 @@
                 <p class="text-cyan-300 text-sm">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p>
                 <p class="text-2xl font-bold text-pink-400 my-2">$${beat.price}</p>
                 
-                <!-- 30-second preview -->
                 <div id="preview-${beat.id}" class="my-3">
-                    <button class="preview-btn w-full" onclick="playPreview('${beat.id}', '${beat.audioUrl}')">▶ Preview (30 sec)</button>
+                    <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">▶ Preview (30 sec)</button>
                     <div class="preview-progress mt-2"><div id="progress-${beat.id}" class="preview-progress-fill"></div></div>
                     <div id="time-${beat.id}" class="preview-time">0:00 / 0:30</div>
+                    <div id="error-${beat.id}" class="error-msg hidden"></div>
                 </div>
                 
                 <div id="paypal-${beat.id}" class="mt-3"></div>
             </div>
         `).join('');
-        
+
+        // Attach event listeners to buttons
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                const url = btn.getAttribute('data-url');
+                playPreview(id, url);
+            });
+        });
+
         beats.forEach(beat => {
             if (window.paypal) {
                 paypal.Buttons({
@@ -86,79 +96,95 @@
         });
     }
 
-    window.playPreview = function(beatId, audioUrl) {
-        // Stop any currently playing preview
+    function playPreview(beatId, audioUrl) {
+        // Stop any current playback
         if (activeAudio) {
             activeAudio.pause();
             activeAudio.currentTime = 0;
-            if (activeProgressInterval) clearInterval(activeProgressInterval);
-            // Reset button text for the previous beat
-            const prevId = activeAudio._beatId;
-            if (prevId) {
-                const prevBtn = document.querySelector(`#preview-${prevId} .preview-btn`);
-                if (prevBtn) prevBtn.innerHTML = '▶ Preview (30 sec)';
-                const prevProgress = document.getElementById(`progress-${prevId}`);
-                if (prevProgress) prevProgress.style.width = '0%';
-                const prevTime = document.getElementById(`time-${prevId}`);
-                if (prevTime) prevTime.innerText = '0:00 / 0:30';
-            }
+            if (activeInterval) clearInterval(activeInterval);
+            const prevBtn = document.querySelector(`.preview-btn[data-id="${activeAudio._beatId}"]`);
+            if (prevBtn) prevBtn.innerHTML = '▶ Preview (30 sec)';
+            const prevProgress = document.getElementById(`progress-${activeAudio._beatId}`);
+            if (prevProgress) prevProgress.style.width = '0%';
+            const prevTime = document.getElementById(`time-${activeAudio._beatId}`);
+            if (prevTime) prevTime.innerText = '0:00 / 0:30';
+            const prevError = document.getElementById(`error-${activeAudio._beatId}`);
+            if (prevError) prevError.classList.add('hidden');
         }
 
-        const audio = new Audio(audioUrl);
-        audio._beatId = beatId;
-        const maxDuration = 30; // seconds
-        let interval = null;
-
-        const btn = document.querySelector(`#preview-${beatId} .preview-btn`);
+        const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
         const progressFill = document.getElementById(`progress-${beatId}`);
         const timeDisplay = document.getElementById(`time-${beatId}`);
+        const errorDiv = document.getElementById(`error-${beatId}`);
 
-        audio.addEventListener('loadedmetadata', () => {
-            // If track is shorter than 30 sec, adjust max
-            const actualMax = Math.min(audio.duration, maxDuration);
+        btn.innerHTML = '⏳ Loading...';
+        btn.disabled = true;
+
+        const audio = new Audio();
+        audio._beatId = beatId;
+        audio.preload = 'metadata';
+        audio.src = audioUrl;
+
+        let maxDuration = 30;
+        let interval = null;
+
+        audio.addEventListener('canplaythrough', () => {
+            maxDuration = Math.min(audio.duration, 30);
             audio.currentTime = 0;
-            audio.play();
-            btn.innerHTML = '⏸ Playing (30s preview)';
+            audio.play().then(() => {
+                btn.innerHTML = '⏸ Playing (30s preview)';
+                btn.disabled = false;
+                errorDiv.classList.add('hidden');
 
-            interval = setInterval(() => {
-                if (audio.currentTime >= actualMax) {
-                    audio.pause();
-                    audio.currentTime = 0;
-                    clearInterval(interval);
-                    btn.innerHTML = '▶ Preview (30 sec)';
-                    progressFill.style.width = '0%';
-                    timeDisplay.innerText = `0:00 / 0:${actualMax < 10 ? '0'+actualMax : actualMax}`;
-                    activeAudio = null;
-                    activeProgressInterval = null;
-                } else {
-                    const percent = (audio.currentTime / actualMax) * 100;
-                    progressFill.style.width = percent + '%';
-                    const currentSec = Math.floor(audio.currentTime);
-                    const remaining = Math.floor(actualMax - audio.currentTime);
-                    timeDisplay.innerText = `${Math.floor(currentSec/60)}:${(currentSec%60).toString().padStart(2,'0')} / 0:${Math.floor(actualMax)}`;
-                }
-            }, 200);
+                interval = setInterval(() => {
+                    if (audio.currentTime >= maxDuration) {
+                        audio.pause();
+                        audio.currentTime = 0;
+                        clearInterval(interval);
+                        btn.innerHTML = '▶ Preview (30 sec)';
+                        progressFill.style.width = '0%';
+                        timeDisplay.innerText = `0:00 / 0:${Math.floor(maxDuration)}`;
+                        activeAudio = null;
+                        activeInterval = null;
+                    } else {
+                        const percent = (audio.currentTime / maxDuration) * 100;
+                        progressFill.style.width = percent + '%';
+                        const currentSec = Math.floor(audio.currentTime);
+                        timeDisplay.innerText = `${Math.floor(currentSec/60)}:${(currentSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`;
+                    }
+                }, 200);
+            }).catch(err => {
+                console.error("Play error:", err);
+                btn.innerHTML = '▶ Preview (30 sec)';
+                btn.disabled = false;
+                errorDiv.classList.remove('hidden');
+                errorDiv.innerText = '❌ Cannot play. Audio file may be inaccessible.';
+            });
         });
 
-        audio.onended = () => {
-            clearInterval(interval);
+        audio.onerror = (e) => {
+            console.error("Audio error:", e);
             btn.innerHTML = '▶ Preview (30 sec)';
-            progressFill.style.width = '0%';
-            timeDisplay.innerText = '0:00 / 0:30';
+            btn.disabled = false;
+            errorDiv.classList.remove('hidden');
+            errorDiv.innerText = '❌ Failed to load audio. Check the audio URL.';
+            if (interval) clearInterval(interval);
             activeAudio = null;
-            activeProgressInterval = null;
+            activeInterval = null;
         };
 
-        audio.onerror = () => {
-            clearInterval(interval);
-            btn.innerHTML = '❌ Preview failed';
-            setTimeout(() => { btn.innerHTML = '▶ Preview (30 sec)'; }, 2000);
+        audio.onended = () => {
+            if (interval) clearInterval(interval);
+            btn.innerHTML = '▶ Preview (30 sec)';
+            progressFill.style.width = '0%';
+            timeDisplay.innerText = `0:00 / 0:${Math.floor(maxDuration)}`;
             activeAudio = null;
+            activeInterval = null;
         };
 
         activeAudio = audio;
-        activeProgressInterval = interval;
-    };
+        activeInterval = interval;
+    }
 
     function escapeHtml(str) { 
         if (!str) return '';
