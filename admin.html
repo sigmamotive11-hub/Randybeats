@@ -2,115 +2,263 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Admin - RANDYBEATS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RANDYBEATS - Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background: #0a0a0a; color: white; font-family: Arial, sans-serif; }
-        input, button { border-radius: 12px; padding: 10px; margin: 8px 0; width: 100%; }
-        input { background: #1a1a2e; border: 1px solid #333; color: white; }
-        button { background: #00e5ff; color: black; font-weight: bold; cursor: pointer; }
-        .delete-btn { background: #ff4444; color: white; }
-        .card { background: #111; border-radius: 20px; padding: 20px; margin-bottom: 20px; border: 1px solid #2a2a3a; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: white; }
+        .modal { transition: opacity 0.2s ease; }
+        .cover-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 12px; border: 1px solid #333; }
+        .beat-card { background: #111; border-radius: 20px; padding: 1rem; transition: 0.2s; border: 1px solid #2a2a3a; }
+        .beat-card:hover { border-color: #00e5ff; transform: translateY(-2px); }
+        .btn-primary { background: linear-gradient(135deg, #00e5ff, #b026ff); }
+        .btn-danger { background: #ff4444; }
+        input, textarea, select { background: #1a1a2e; border: 1px solid #333; border-radius: 12px; padding: 10px 14px; color: white; width: 100%; }
+        input:focus, textarea:focus { outline: none; border-color: #00e5ff; }
+        .upload-zone { border: 2px dashed #444; border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+        .upload-zone:hover { border-color: #00e5ff; background: rgba(0,229,255,0.05); }
     </style>
 </head>
-<body class="p-6 max-w-3xl mx-auto">
-    <h1 class="text-3xl font-bold mb-4">RANDYBEATS - Admin</h1>
-    <div id="loginDiv" class="card">
-        <input type="password" id="adminPassword" placeholder="Admin Password">
-        <button onclick="checkLogin()">Login</button>
+<body class="p-6">
+
+<div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-500 bg-clip-text text-transparent">RANDYBEATS · Admin</h1>
+        <button onclick="logout()" class="border border-gray-600 px-4 py-2 rounded-full text-sm">Logout</button>
     </div>
-    <div id="adminPanel" style="display:none;" class="space-y-6">
-        <div class="card">
-            <h2>➕ Add Beat</h2>
-            <form id="beatForm">
-                <input type="text" id="title" placeholder="Title" required>
-                <input type="text" id="genre" placeholder="Genre">
-                <input type="number" id="bpm" placeholder="BPM">
-                <input type="number" step="0.01" id="price" placeholder="Price" required>
-                <input type="url" id="audioUrl" placeholder="Audio URL (catbox.moe WAV)" required>
-                <input type="url" id="coverArt" placeholder="Cover URL (optional)">
-                <button type="submit">Save Beat</button>
-            </form>
-        </div>
-        <div class="card">
-            <h2>📀 Beats</h2>
-            <div id="beatsList"></div>
-        </div>
+
+    <div class="mb-8">
+        <button onclick="openAddModal()" class="btn-primary px-6 py-3 rounded-full font-bold shadow-lg">+ Add New Beat</button>
     </div>
-    <script>
-        const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
-        // ⚠️ REPLACE THIS WITH YOUR *NEW* API KEY AFTER YOU REVOKE THE OLD ONE
-        const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
-        const ADMIN_PASSWORD = "randybeats2025";
 
-        let beats = [];
+    <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+</div>
 
-        async function loadBeats() {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            const data = await res.json();
-            beats = data.record || [];
-            renderBeatList();
-        }
-
-        async function saveBeats() {
-            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-                body: JSON.stringify(beats)
-            });
-        }
-
-        function renderBeatList() {
-            const container = document.getElementById('beatsList');
-            if (!beats.length) { container.innerHTML = '<p>No beats</p>'; return; }
-            container.innerHTML = beats.map(beat => `
-                <div class="bg-gray-800 p-3 rounded mb-2">
-                    <strong>${escapeHtml(beat.title)}</strong> - $${beat.price}<br>
-                    <button class="delete-btn mt-1" onclick="deleteBeat('${beat.id}')">Delete</button>
+<!-- Modal for Add/Edit Beat -->
+<div id="beatModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="bg-gray-900 rounded-2xl max-w-lg w-full p-6 border border-cyan-500/30">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="modalTitle" class="text-2xl font-bold">Add New Beat</h2>
+            <button onclick="closeModal()" class="text-gray-400 text-2xl">&times;</button>
+        </div>
+        <form id="beatForm">
+            <input type="hidden" id="beatId">
+            <div class="mb-3">
+                <label class="block text-sm mb-1">Title *</label>
+                <input type="text" id="title" required>
+            </div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div>
+                    <label class="block text-sm mb-1">Genre</label>
+                    <input type="text" id="genre" placeholder="Trap, Drill, etc.">
                 </div>
-            `).join('');
-        }
+                <div>
+                    <label class="block text-sm mb-1">BPM</label>
+                    <input type="number" id="bpm" placeholder="140">
+                </div>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm mb-1">Price (USD) *</label>
+                <input type="number" step="0.01" id="price" required>
+            </div>
+            <div class="mb-3">
+                <label class="block text-sm mb-1">Audio URL (catbox.moe WAV link) *</label>
+                <input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required>
+                <p class="text-xs text-gray-400 mt-1">Upload your WAV to <a href="https://catbox.moe" target="_blank" class="text-cyan-400">catbox.moe</a> and paste the link here.</p>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1">Cover Art (optional)</label>
+                <div id="coverUploadZone" class="upload-zone">
+                    <input type="file" id="coverFile" accept="image/jpeg,image/png,image/webp" class="hidden">
+                    <div id="coverPreview" class="text-center">
+                        <div class="text-3xl mb-1">🖼️</div>
+                        <p class="text-sm">Click to upload cover image</p>
+                    </div>
+                </div>
+                <input type="hidden" id="coverUrl">
+                <div id="uploadStatus" class="text-xs mt-1"></div>
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 btn-primary py-3 rounded-xl font-bold">Save Beat</button>
+                <button type="button" onclick="closeModal()" class="px-5 border border-gray-600 rounded-xl">Cancel</button>
+            </div>
+        </form>
+    </div>
+</div>
 
-        window.deleteBeat = async (id) => {
-            if (confirm('Delete?')) {
-                beats = beats.filter(b => b.id !== id);
-                await saveBeats();
-                renderBeatList();
+<script>
+    // ==================== CONFIGURATION ====================
+    const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
+    const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
+    const ADMIN_PASSWORD = "randybeats2025";
+    const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";  // ✅ Your ImgBB key
+
+    let beats = [];
+    let isEditMode = false;
+
+    function checkAuth() {
+        const session = sessionStorage.getItem('adminAuth');
+        if (session !== 'true') {
+            const pwd = prompt("Enter admin password:");
+            if (pwd === ADMIN_PASSWORD) {
+                sessionStorage.setItem('adminAuth', 'true');
+                loadBeats();
+            } else {
+                document.body.innerHTML = '<div class="flex items-center justify-center h-screen text-center"><div><h1 class="text-2xl mb-4">Access Denied</h1><button onclick="location.reload()" class="bg-cyan-500 px-4 py-2 rounded">Try Again</button></div></div>';
             }
+        } else {
+            loadBeats();
+        }
+    }
+
+    async function loadBeats() {
+        const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': JSONBIN_API_KEY }
+        });
+        const data = await res.json();
+        beats = data.record || [];
+        renderBeats();
+    }
+
+    async function saveBeats() {
+        await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
+            body: JSON.stringify(beats)
+        });
+    }
+
+    function renderBeats() {
+        const grid = document.getElementById('beatsGrid');
+        if (!beats.length) {
+            grid.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-20">No beats yet. Click "+ Add New Beat" to start.</div>';
+            return;
+        }
+        grid.innerHTML = beats.map(beat => `
+            <div class="beat-card">
+                <div class="flex gap-3">
+                    ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-16 h-16 rounded-xl object-cover">` : `<div class="w-16 h-16 bg-gray-800 rounded-xl flex items-center justify-center text-2xl">🎧</div>`}
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg">${escapeHtml(beat.title)}</h3>
+                        <p class="text-sm text-cyan-300">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p>
+                        <p class="text-pink-400 font-bold">$${beat.price}</p>
+                    </div>
+                </div>
+                <div class="flex gap-2 mt-3">
+                    <button onclick="editBeat('${beat.id}')" class="flex-1 bg-gray-700 hover:bg-gray-600 py-2 rounded-lg text-sm">Edit</button>
+                    <button onclick="deleteBeat('${beat.id}')" class="flex-1 bg-red-600 hover:bg-red-700 py-2 rounded-lg text-sm">Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.editBeat = (id) => {
+        const beat = beats.find(b => b.id === id);
+        if (!beat) return;
+        isEditMode = true;
+        document.getElementById('modalTitle').innerText = 'Edit Beat';
+        document.getElementById('beatId').value = beat.id;
+        document.getElementById('title').value = beat.title;
+        document.getElementById('genre').value = beat.genre || '';
+        document.getElementById('bpm').value = beat.bpm;
+        document.getElementById('price').value = beat.price;
+        document.getElementById('audioUrl').value = beat.audioUrl;
+        document.getElementById('coverUrl').value = beat.coverArt || '';
+        if (beat.coverArt) {
+            document.getElementById('coverPreview').innerHTML = `<img src="${beat.coverArt}" class="cover-preview mx-auto"><p class="text-xs mt-1">Current cover</p>`;
+        } else {
+            document.getElementById('coverPreview').innerHTML = '<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>';
+        }
+        openModal();
+    };
+
+    window.deleteBeat = async (id) => {
+        if (confirm('Delete this beat permanently?')) {
+            beats = beats.filter(b => b.id !== id);
+            await saveBeats();
+            renderBeats();
+        }
+    };
+
+    async function uploadCover(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        formData.append('key', IMGBB_API_KEY);
+        const res = await fetch('https://api.imgbb.com/1/upload', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error?.message || 'Upload failed');
+        return data.data.url;
+    }
+
+    document.getElementById('coverUploadZone').addEventListener('click', () => {
+        document.getElementById('coverFile').click();
+    });
+    document.getElementById('coverFile').addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const statusDiv = document.getElementById('uploadStatus');
+        statusDiv.innerText = 'Uploading cover...';
+        statusDiv.style.color = '#00e5ff';
+        try {
+            const url = await uploadCover(file);
+            document.getElementById('coverUrl').value = url;
+            document.getElementById('coverPreview').innerHTML = `<img src="${url}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-green-400">Cover uploaded ✓</p>`;
+            statusDiv.innerText = '';
+        } catch (err) {
+            statusDiv.innerText = 'Upload failed: ' + err.message;
+            statusDiv.style.color = '#ff4444';
+        }
+    });
+
+    document.getElementById('beatForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('beatId').value || Date.now().toString();
+        const title = document.getElementById('title').value.trim();
+        if (!title) return alert('Title required');
+        const audioUrl = document.getElementById('audioUrl').value.trim();
+        if (!audioUrl) return alert('Audio URL required');
+
+        const newBeat = {
+            id: id,
+            title: title,
+            genre: document.getElementById('genre').value.trim() || 'Instrumental',
+            bpm: document.getElementById('bpm').value || '140',
+            price: parseFloat(document.getElementById('price').value).toFixed(2),
+            audioUrl: audioUrl,
+            coverArt: document.getElementById('coverUrl').value || ''
         };
 
-        document.getElementById('beatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const newBeat = {
-                id: Date.now().toString(),
-                title: document.getElementById('title').value,
-                genre: document.getElementById('genre').value || 'Instrumental',
-                bpm: document.getElementById('bpm').value || '140',
-                price: parseFloat(document.getElementById('price').value).toFixed(2),
-                audioUrl: document.getElementById('audioUrl').value,
-                coverArt: document.getElementById('coverArt').value || ''
-            };
-            beats.push(newBeat);
-            await saveBeats();
-            renderBeatList();
-            document.getElementById('beatForm').reset();
-            alert('Beat added');
-        });
+        const existingIndex = beats.findIndex(b => b.id === id);
+        if (existingIndex !== -1) beats[existingIndex] = newBeat;
+        else beats.push(newBeat);
 
-        function checkLogin() {
-            if (document.getElementById('adminPassword').value === ADMIN_PASSWORD) {
-                document.getElementById('loginDiv').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                loadBeats();
-            } else alert('Wrong password');
-        }
+        await saveBeats();
+        renderBeats();
+        closeModal();
+        alert('Beat saved!');
+    });
 
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-        }
-    </script>
+    function openAddModal() {
+        isEditMode = false;
+        document.getElementById('modalTitle').innerText = 'Add New Beat';
+        document.getElementById('beatForm').reset();
+        document.getElementById('beatId').value = '';
+        document.getElementById('coverUrl').value = '';
+        document.getElementById('coverPreview').innerHTML = '<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>';
+        document.getElementById('uploadStatus').innerText = '';
+        openModal();
+    }
+
+    function openModal() { document.getElementById('beatModal').classList.remove('hidden'); document.getElementById('beatModal').classList.add('flex'); }
+    function closeModal() { document.getElementById('beatModal').classList.add('hidden'); document.getElementById('beatModal').classList.remove('flex'); }
+    function logout() { sessionStorage.removeItem('adminAuth'); location.reload(); }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+    checkAuth();
+</script>
 </body>
 </html>
