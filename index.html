@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>RANDYBEATS | Obsidian & Gold</title>
+    <title>RANDYBEATS | Motion Background</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdA9_iV1iAS2sxMJZCT3-Bx1xpdF5U7N2oQalAkZnCjX7BtlAdfpfDl3KHuvW9gQkUeGHoaO0vMcYm11&currency=USD"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -19,43 +19,32 @@
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            background: #050508;
         }
-        /* Full-screen background image with overlay */
-        .bg-image {
+        /* Canvas background */
+        #bg-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=2070&auto=format&fit=crop'); /* HD music / vinyl / warm tones */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
             z-index: -1;
+            display: block;
         }
-        /* Glassmorphic card with gold accent */
+        /* Glass cards with gold accent */
         .beat-card {
-            background: rgba(20, 20, 25, 0.65);
-            backdrop-filter: blur(14px);
-            border-radius: 24px;
-            border: 1px solid rgba(212, 175, 55, 0.15);
+            background: rgba(15, 15, 20, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
             transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
             overflow: hidden;
             box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.5);
         }
         .beat-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(212, 175, 55, 0.5);
-            box-shadow: 0 25px 40px -15px rgba(212, 175, 55, 0.2);
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 25px 40px -15px rgba(212, 175, 55, 0.25);
         }
         .cover-img {
             width: 100%;
@@ -177,8 +166,8 @@
     </style>
 </head>
 <body>
-    <div class="bg-image"></div>
-    <div class="overlay"></div>
+
+    <canvas id="bg-canvas"></canvas>
 
     <div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
         <!-- Header -->
@@ -198,6 +187,116 @@
     </div>
 
     <script>
+        // ==================== INTERACTIVE CANVAS BACKGROUND ====================
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+
+        function resizeCanvas() {
+            width = window.innerWidth;
+            height = window.innerHeight;
+            canvas.width = width;
+            canvas.height = height;
+        }
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            targetX = e.clientX;
+            targetY = e.clientY;
+            // smooth interpolation
+            mouseX = mouseX * 0.95 + targetX * 0.05;
+            mouseY = mouseY * 0.95 + targetY * 0.05;
+        });
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.size = Math.random() * 2.5 + 0.5;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.2;
+                this.alpha = Math.random() * 0.4 + 0.1;
+                this.color = `rgba(212, 175, 55, ${this.alpha})`;
+            }
+            update() {
+                // mouse influence: particles move away from mouse slightly
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 150) {
+                    const angle = Math.atan2(dy, dx);
+                    const force = (150 - dist) / 150 * 0.5;
+                    this.x += Math.cos(angle) * force;
+                    this.y += Math.sin(angle) * force;
+                }
+                this.x += this.speedX;
+                this.y += this.speedY;
+                // wrap around
+                if (this.x < 0) this.x = width;
+                if (this.x > width) this.x = 0;
+                if (this.y < 0) this.y = height;
+                if (this.y > height) this.y = 0;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const count = Math.min(300, Math.floor(width * height / 8000));
+            for (let i = 0; i < count; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        let gradientOffset = 0;
+        function drawBackground() {
+            // gradient that shifts over time
+            const grad = ctx.createLinearGradient(0, 0, width, height);
+            const shift = (Date.now() * 0.0003) % 1;
+            grad.addColorStop(0, `hsl(40, 30%, ${5 + Math.sin(shift) * 2}%)`);
+            grad.addColorStop(0.5, `hsl(280, 25%, 8%)`);
+            grad.addColorStop(1, `hsl(20, 20%, 3%)`);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, width, height);
+            // draw subtle vignette
+            const vignette = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width/1.5);
+            vignette.addColorStop(0, 'rgba(0,0,0,0)');
+            vignette.addColorStop(1, 'rgba(0,0,0,0.6)');
+            ctx.fillStyle = vignette;
+            ctx.fillRect(0, 0, width, height);
+        }
+
+        function animateBackground() {
+            if (!ctx) return;
+            drawBackground();
+            for (let p of particles) {
+                p.update();
+                p.draw();
+            }
+            requestAnimationFrame(animateBackground);
+        }
+
+        function startCanvas() {
+            resizeCanvas();
+            initParticles();
+            animateBackground();
+        }
+
+        startCanvas();
+
+        // ==================== BEAT STORE LOGIC (unchanged, working) ====================
         const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
         const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
 
