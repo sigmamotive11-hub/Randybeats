@@ -6,325 +6,150 @@
     <title>RANDYBEATS | Premium Instrumentals</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdA9_iV1iAS2sxMJZCT3-Bx1xpdF5U7N2oQalAkZnCjX7BtlAdfpfDl3KHuvW9gQkUeGHoaO0vMcYm11&currency=USD"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0B0C10; color: #E0E0E0; scroll-behavior: smooth; }
-        :root {
-            --bg-deep: #0A0A0F;
-            --card-glass: rgba(18, 22, 35, 0.7);
-            --border-glow: rgba(0, 255, 255, 0.2);
-            --accent-primary: #00E5FF;
-            --accent-secondary: #B026FF;
-            --shadow-neon: 0 8px 32px rgba(0, 229, 255, 0.1);
-        }
-        .mesh-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -2;
-            background: radial-gradient(circle at 20% 30%, #0A0F1F, #030407);
-        }
-        .mesh-bg::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 80% 70%, rgba(176, 38, 255, 0.15), transparent 50%);
-            animation: drift 18s infinite alternate;
-        }
-        @keyframes drift {
-            0% { opacity: 0.4; transform: scale(1);}
-            100% { opacity: 0.8; transform: scale(1.2);}
-        }
-        .glass-card {
-            background: var(--card-glass);
-            backdrop-filter: blur(14px);
-            border: 1px solid rgba(0, 229, 255, 0.2);
-            border-radius: 28px;
-            transition: all 0.3s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
-        .glass-card:hover {
-            border-color: var(--accent-primary);
-            transform: translateY(-6px);
-            box-shadow: var(--shadow-neon);
-        }
-        .btn-primary {
-            background: linear-gradient(105deg, #00E5FF, #B026FF);
-            border: none;
-            transition: all 0.2s ease;
-            font-weight: 600;
-        }
-        .btn-primary:hover { transform: scale(0.98); box-shadow: 0 0 12px #00E5FF; }
-        .btn-outline {
-            border: 1px solid rgba(0, 229, 255, 0.6);
-            background: transparent;
-            transition: 0.2s;
-        }
-        .btn-outline:hover { background: rgba(0, 229, 255, 0.1); border-color: #00E5FF; }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #111; border-radius: 8px; }
-        ::-webkit-scrollbar-thumb { background: #00E5FF; border-radius: 8px; }
-        .wave-group {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            height: 32px;
-        }
-        .wave-bar {
-            width: 3px;
-            background: linear-gradient(to top, #00E5FF, #B026FF);
-            border-radius: 2px;
-            transition: height 0.2s;
-        }
-        audio {
-            width: 100%;
-            height: 38px;
-            border-radius: 60px;
-            background: #1A1E2A;
-        }
-        .upload-zone {
-            border: 2px dashed rgba(0, 229, 255, 0.4);
-            border-radius: 20px;
-            background: rgba(0, 229, 255, 0.02);
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .upload-zone:hover { border-color: #00E5FF; background: rgba(0, 229, 255, 0.06); }
-        .admin-modal {
-            backdrop-filter: blur(12px);
-            background: rgba(8, 10, 18, 0.95);
-            border-left: 2px solid #00E5FF;
-        }
-        .cover-img {
-            object-fit: cover;
-            width: 100%;
-            height: 200px;
-            border-radius: 20px;
-            border: 1px solid rgba(0,229,255,0.3);
-        }
-        @keyframes fadeSlide {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .beat-card { animation: fadeSlide 0.4s ease forwards; }
-        .audio-error { color: #ff6b6b; font-size: 12px; margin-top: 6px; text-align: center; }
+        body { font-family: 'Inter', sans-serif; background: #0B0C10; color: #E0E0E0; }
+        .glass-card { background: rgba(18,22,35,0.7); backdrop-filter: blur(14px); border: 1px solid rgba(0,229,255,0.2); border-radius: 28px; transition: all 0.3s; }
+        .glass-card:hover { border-color: #00E5FF; transform: translateY(-6px); }
+        .btn-primary { background: linear-gradient(105deg, #00E5FF, #B026FF); }
+        .upload-zone { border: 2px dashed rgba(0,229,255,0.4); border-radius: 20px; background: rgba(0,229,255,0.02); cursor: pointer; }
+        .cover-img { object-fit: cover; width: 100%; height: 200px; border-radius: 20px; }
+        audio { width: 100%; border-radius: 60px; background: #1A1E2A; }
+        .wave-group { display: flex; gap: 3px; height: 32px; justify-content: center; }
+        .wave-bar { width: 3px; background: linear-gradient(to top, #00E5FF, #B026FF); border-radius: 2px; }
     </style>
 </head>
 <body>
-<div class="mesh-bg"></div>
 
-<nav class="fixed top-0 left-0 w-full z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
+<nav class="fixed top-0 w-full z-50 bg-black/40 backdrop-blur-xl border-b border-white/10">
     <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-400 to-purple-600 flex items-center justify-center shadow-lg">
-                <span class="text-black font-bold text-xl">R</span>
-            </div>
-            <h1 class="text-2xl font-bold tracking-tight bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-400 bg-clip-text text-transparent">RANDYBEATS</h1>
+            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-cyan-400 to-purple-600 flex items-center justify-center">R</div>
+            <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-300 via-purple-400 to-pink-400 bg-clip-text text-transparent">RANDYBEATS</h1>
         </div>
-        <button onclick="openAdminModal()" class="px-5 py-2 rounded-full text-sm font-medium border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10 transition-all backdrop-blur-sm">🔐 ADMIN</button>
+        <button onclick="openAdminModal()" class="px-5 py-2 rounded-full border border-cyan-500/50 text-cyan-300 hover:bg-cyan-500/10">🔐 ADMIN</button>
     </div>
 </nav>
 
-<section class="pt-32 pb-16 text-center px-4">
+<section class="pt-32 pb-16 text-center">
     <div class="max-w-4xl mx-auto">
-        <div class="inline-block mb-4 px-4 py-1 rounded-full bg-white/5 border border-white/10 text-cyan-300 text-sm font-mono">🎧 EXCLUSIVE BEATS</div>
-        <h2 class="text-5xl md:text-7xl font-bold tracking-tighter bg-gradient-to-r from-white via-cyan-300 to-purple-400 bg-clip-text text-transparent">Premium Instrumentals</h2>
-        <p class="text-gray-300 text-lg md:text-xl mt-4 max-w-2xl mx-auto">Instant delivery · Unlimited license · High quality WAV + MP3</p>
-        <div class="flex justify-center gap-6 mt-8 text-sm font-mono text-cyan-300">
-            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-cyan-400 rounded-full animate-pulse"></span> <span id="beatCount">0</span> Beats Available</div>
-            <div class="flex items-center gap-2"><span class="w-2 h-2 bg-purple-500 rounded-full"></span> PayPal Secure</div>
+        <h2 class="text-5xl md:text-7xl font-bold bg-gradient-to-r from-white via-cyan-300 to-purple-400 bg-clip-text text-transparent">Premium Instrumentals</h2>
+        <p class="text-gray-300 mt-4">Instant delivery · Unlimited license</p>
+        <div class="flex justify-center gap-6 mt-8 text-cyan-300">
+            <span id="beatCount">0</span> Beats Available
         </div>
     </div>
 </section>
 
 <main class="max-w-7xl mx-auto px-6 pb-20">
     <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-    <div id="emptyState" class="hidden text-center py-20 glass-card p-12 rounded-3xl">
-        <div class="text-6xl mb-4">🎛️</div>
-        <p class="text-gray-400 text-xl">No beats uploaded yet. <br> <span class="text-cyan-300">Admin panel → add your first beat.</span></p>
-    </div>
+    <div id="emptyState" class="hidden text-center py-20 glass-card p-12">No beats yet. Add via admin.</div>
 </main>
 
-<div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md transition-all">
-    <div class="w-full max-w-2xl rounded-3xl admin-modal border border-cyan-500/30 shadow-2xl overflow-hidden">
-        <div id="loginScreen" class="p-8">
-            <div class="text-center mb-6">
-                <div class="w-16 h-16 mx-auto rounded-full bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center text-2xl">🔒</div>
-                <h3 class="text-2xl font-bold mt-4 text-white">Admin Access</h3>
-                <p class="text-gray-400 text-sm">Enter master password</p>
-            </div>
-            <input type="password" id="adminPassInput" placeholder="Password" class="w-full bg-black/50 border border-cyan-500/30 rounded-xl p-3 text-white focus:outline-none focus:border-cyan-400">
-            <button onclick="verifyAdmin()" class="w-full mt-5 btn-primary text-white font-bold py-3 rounded-xl transition">UNLOCK PANEL</button>
+<!-- ADMIN MODAL -->
+<div id="adminModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/70 backdrop-blur-md">
+    <div class="w-full max-w-2xl rounded-3xl bg-black/90 border border-cyan-500/30 p-6">
+        <div id="loginScreen">
+            <h3 class="text-2xl font-bold text-center mb-4">Admin Access</h3>
+            <input type="password" id="adminPassInput" class="w-full bg-black/50 border border-cyan-500/30 rounded-xl p-3 text-white">
+            <button onclick="verifyAdmin()" class="w-full mt-4 btn-primary text-white font-bold py-3 rounded-xl">UNLOCK</button>
         </div>
-        <div id="adminPanel" class="hidden p-6">
-            <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-5">
-                <h3 class="text-2xl font-bold text-cyan-300">🎛️ Beat Studio</h3>
-                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-white text-2xl leading-5">&times;</button>
+        <div id="adminPanel" class="hidden">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+                <h3 class="text-2xl font-bold text-cyan-300">Beat Studio</h3>
+                <button onclick="closeAdminModal()" class="text-gray-400 text-2xl">&times;</button>
             </div>
-            <form id="beatForm" class="space-y-5">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input type="text" id="beatTitle" placeholder="Beat title *" class="bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white focus:ring-1 focus:ring-cyan-400">
-                    <input type="text" id="beatGenre" placeholder="Genre (Trap / Drill / RnB)" class="bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white">
+            <form id="beatForm" class="space-y-4">
+                <input type="text" id="beatTitle" placeholder="Beat Title" class="w-full bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="beatGenre" placeholder="Genre">
+                    <input type="number" id="beatBpm" placeholder="BPM">
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="number" id="beatBpm" placeholder="BPM" class="bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white">
-                    <input type="number" id="beatPrice" placeholder="Price USD" step="0.01" class="bg-black/40 border border-purple-500/40 rounded-xl p-3 text-white">
-                </div>
+                <input type="number" id="beatPrice" placeholder="Price USD" step="0.01" class="w-full bg-black/40 rounded-xl p-3">
+                
+                <!-- AUDIO FILENAME (not URL) -->
                 <div>
-                    <label class="text-xs uppercase tracking-wider text-gray-400">Audio file (MP3 / WAV)</label>
-                    <div id="audioUploadZone" class="upload-zone p-4 text-center mt-1 relative">
-                        <input type="file" id="audioFileInput" accept=".mp3,.wav,.ogg" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="audioZoneContent"><div class="text-2xl">🎵</div><p class="text-xs text-cyan-300 mt-1">Click to upload audio</p></div>
-                    </div>
-                    <div id="audioProgressBar" class="hidden w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden"><div id="audioProgressFill" class="h-full bg-gradient-to-r from-cyan-400 to-purple-500 w-0"></div></div>
-                    <div id="audioStatusMsg" class="text-xs text-gray-400 mt-1"></div>
+                    <label class="text-xs text-gray-400">Audio filename in B2 bucket (e.g., beat123.mp3)</label>
+                    <input type="text" id="beatAudioFilename" placeholder="filename.mp3" class="w-full bg-black/40 border border-cyan-500/30 rounded-xl p-3 text-white">
+                    <p class="text-[10px] text-gray-500 mt-1">File must already exist in your 'randybeats' bucket.</p>
                 </div>
+
+                <!-- COVER UPLOAD (optional) -->
                 <div>
-                    <label class="text-xs uppercase tracking-wider text-gray-400">Cover art (JPG/PNG)</label>
-                    <div id="coverUploadZone" class="upload-zone p-4 text-center mt-1 relative">
-                        <input type="file" id="coverFileInput" accept="image/jpeg,image/png,image/webp" class="absolute inset-0 opacity-0 cursor-pointer">
-                        <div id="coverZoneContent"><div class="text-2xl">🖼️</div><p class="text-xs text-cyan-300 mt-1">Upload cover</p></div>
+                    <label class="text-xs text-gray-400">Cover art (optional)</label>
+                    <div id="coverUploadZone" class="upload-zone p-3 text-center">
+                        <input type="file" id="coverFileInput" accept="image/*" class="hidden">
+                        <div id="coverZoneContent">📸 Click to upload cover</div>
                     </div>
-                    <div id="coverProgressBar" class="hidden w-full h-1 bg-gray-700 rounded-full mt-2 overflow-hidden"><div id="coverProgressFill" class="h-full bg-gradient-to-r from-cyan-400 to-purple-500 w-0"></div></div>
-                    <div id="coverStatusMsg" class="text-xs text-gray-400 mt-1"></div>
+                    <div id="coverStatus" class="text-xs mt-1"></div>
                 </div>
                 <input type="hidden" id="beatId">
-                <input type="hidden" id="beatAudioUrl">
                 <input type="hidden" id="beatCoverUrl">
-                <div class="flex gap-3 pt-2">
-                    <button type="submit" class="flex-1 btn-primary text-black font-bold py-3 rounded-xl">💾 SAVE BEAT</button>
-                    <button type="button" onclick="resetAdminForm()" class="px-5 border border-gray-500 rounded-xl text-gray-300 hover:bg-white/5">Clear</button>
-                </div>
+                <button type="submit" class="w-full btn-primary text-black font-bold py-3 rounded-xl">💾 SAVE BEAT</button>
             </form>
-            <div class="mt-8">
-                <h4 class="text-sm font-mono text-cyan-400 mb-3">📀 CURRENT INVENTORY</h4>
-                <div id="adminBeatList" class="space-y-2 max-h-64 overflow-y-auto pr-1"></div>
+            <div class="mt-6">
+                <h4 class="text-sm font-mono text-cyan-400">Current Beats</h4>
+                <div id="adminBeatList" class="space-y-2 max-h-64 overflow-y-auto mt-2"></div>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // ================= BACKBLAZE CONFIG =================
-    const B2_KEY_ID = 'b1181fb58a82';
-    const B2_APP_KEY = '003ff1ec1a4cecc0940a17984ba70bba874dda5233';
-    const B2_BUCKET_NAME = 'randybeats';
-    const B2_ENDPOINT = 'https://s3.eu-central-003.backblazeb2.com';
-    const B2_PUBLIC_URL = `${B2_ENDPOINT}/${B2_BUCKET_NAME}`;
-    const ADMIN_PASSWORD = 'Z7@qL9!vR2#pXr8$T4^mK6&cN1*HsW3';
+    // ========== YOUR BACKBLAZE CREDENTIALS (EMBEDDED) ==========
+    const B2_KEY_ID = "003b1181fb58a820000000001";
+    const B2_APP_KEY = "K003c3cZuuAr6jFDR5+HG8256evJbao";
+    const B2_BUCKET_NAME = "randybeats";
+    const B2_ENDPOINT = "https://s3.eu-central-003.backblazeb2.com";
+    const B2_PUBLIC_URL_BASE = `${B2_ENDPOINT}/${B2_BUCKET_NAME}`;
 
-    let beats = [];
-    try {
-        const stored = localStorage.getItem('randybeats_data');
-        if (stored) beats = JSON.parse(stored);
-    } catch(e) { beats = []; }
+    const ADMIN_PASSWORD = "Z7@qL9!vR2#pXr8$T4^mK6&cN1*HsW3";
 
-    let b2AuthToken = null, b2UploadUrl = null, b2UploadToken = null;
+    let beats = JSON.parse(localStorage.getItem('randybeats_data') || '[]');
+    let b2AuthToken = null;
+    let b2ApiUrl = null;
+    let b2DownloadAuthToken = null; // for signed URLs
 
-    async function authorizeB2() {
+    // Authenticate with B2 using your keys
+    async function b2Authenticate() {
         const credentials = btoa(`${B2_KEY_ID}:${B2_APP_KEY}`);
         const res = await fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
             headers: { 'Authorization': `Basic ${credentials}` }
         });
-        if (!res.ok) throw new Error('Backblaze auth failed');
-        return await res.json();
-    }
-
-    async function getUploadUrl(apiUrl, bucketId) {
-        const res = await fetch(`${apiUrl}/b2api/v2/b2_get_upload_url`, {
-            method: 'POST',
-            headers: { 'Authorization': b2AuthToken, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ bucketId })
-        });
-        if (!res.ok) throw new Error('Cannot get upload URL');
+        if (!res.ok) throw new Error('B2 auth failed');
         const data = await res.json();
-        b2UploadUrl = data.uploadUrl;
-        b2UploadToken = data.authorizationToken;
+        b2AuthToken = data.authorizationToken;
+        b2ApiUrl = data.apiUrl;
         return data;
     }
 
-    async function uploadToB2(file, progressFillElem, statusElem) {
-        const progressBarDiv = progressFillElem.parentElement;
-        progressBarDiv.classList.remove('hidden');
-        statusElem.innerText = 'Connecting...';
-        const authData = await authorizeB2();
-        b2AuthToken = authData.authorizationToken;
-        await getUploadUrl(authData.apiUrl, authData.allowed.bucketId);
-        
-        const cleanName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-');
-        const fileName = `beat_${Date.now()}_${cleanName}`;
-        statusElem.innerText = 'Uploading...';
-        progressFillElem.style.width = '25%';
-        
-        const arrayBuffer = await file.arrayBuffer();
-        const hashBuffer = await crypto.subtle.digest('SHA-1', arrayBuffer);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        const sha1 = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        progressFillElem.style.width = '60%';
-        
-        const uploadRes = await fetch(b2UploadUrl, {
-            method: 'POST',
-            headers: {
-                'Authorization': b2UploadToken,
-                'X-Bz-File-Name': encodeURIComponent(fileName),
-                'Content-Type': file.type || 'application/octet-stream',
-                'Content-Length': file.size,
-                'X-Bz-Content-Sha1': sha1
-            },
-            body: arrayBuffer
-        });
-        if (!uploadRes.ok) {
-            const errText = await uploadRes.text();
-            throw new Error(`Upload fail: ${errText}`);
+    // Get a download authorization (signed URL) for a specific file
+    async function getSignedAudioUrl(fileName) {
+        try {
+            if (!b2AuthToken) await b2Authenticate();
+            const res = await fetch(`${b2ApiUrl}/b2api/v2/b2_get_download_authorization`, {
+                method: 'POST',
+                headers: { 'Authorization': b2AuthToken, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    bucketId: (await b2Authenticate()).allowed.bucketId,
+                    fileNamePrefix: fileName,
+                    validDurationInSeconds: 86400 // 24 hours
+                })
+            });
+            if (!res.ok) throw new Error('Failed to get download auth');
+            const data = await res.json();
+            const downloadUrl = `${B2_PUBLIC_URL_BASE}/${fileName}?Authorization=${data.authorizationToken}`;
+            return downloadUrl;
+        } catch (err) {
+            console.error("Signed URL error:", err);
+            // Fallback to public URL (if bucket is public)
+            return `${B2_PUBLIC_URL_BASE}/${fileName}`;
         }
-        progressFillElem.style.width = '100%';
-        statusElem.innerText = '✅ Uploaded';
-        statusElem.style.color = '#4ade80';
-        return `${B2_PUBLIC_URL}/${fileName}`;
     }
 
-    // File upload handlers
-    document.getElementById('audioFileInput')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const statusDiv = document.getElementById('audioStatusMsg');
-        const progressFill = document.getElementById('audioProgressFill');
-        const zoneContent = document.getElementById('audioZoneContent');
-        try {
-            const url = await uploadToB2(file, progressFill, statusDiv);
-            document.getElementById('beatAudioUrl').value = url;
-            zoneContent.innerHTML = `<div class="text-xl">✅</div><p class="text-xs text-green-400">${file.name} (${(file.size/1048576).toFixed(1)} MB)</p>`;
-            document.getElementById('audioUploadZone').classList.add('border-cyan-400');
-            // Test if audio URL is reachable (optional HEAD)
-            fetch(url, { method: 'HEAD', mode: 'cors' }).catch(()=>{});
-        } catch(err) {
-            statusDiv.innerText = '❌ Upload error: ' + err.message;
-            statusDiv.style.color = '#ff8888';
-        }
-    });
-
-    document.getElementById('coverFileInput')?.addEventListener('change', async (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const statusDiv = document.getElementById('coverStatusMsg');
-        const progressFill = document.getElementById('coverProgressFill');
-        const zoneContent = document.getElementById('coverZoneContent');
-        try {
-            const url = await uploadToB2(file, progressFill, statusDiv);
-            document.getElementById('beatCoverUrl').value = url;
-            const previewUrl = URL.createObjectURL(file);
-            zoneContent.innerHTML = `<img src="${previewUrl}" class="w-16 h-16 rounded-lg mx-auto object-cover border border-cyan-400"><p class="text-xs mt-1 text-cyan-300">cover ready</p>`;
-            document.getElementById('coverUploadZone').classList.add('border-cyan-400');
-        } catch(err) {
-            statusDiv.innerText = 'Cover upload failed: ' + err.message;
-        }
-    });
-
-    function renderStore() {
+    // Render store with signed audio URLs
+    async function renderStore() {
         const container = document.getElementById('beatsGrid');
         const emptyDiv = document.getElementById('emptyState');
         if (!beats.length) {
@@ -335,198 +160,196 @@
         }
         emptyDiv.classList.add('hidden');
         document.getElementById('beatCount').innerText = beats.length;
+
+        // Generate signed URLs for all beats (async)
+        for (let beat of beats) {
+            if (beat.audioFilename && !beat._signedUrl) {
+                try {
+                    beat._signedUrl = await getSignedAudioUrl(beat.audioFilename);
+                } catch(e) { beat._signedUrl = null; }
+            }
+        }
+
         container.innerHTML = beats.map(beat => `
-            <div class="glass-card beat-card p-5 flex flex-col transition-all duration-300" data-id="${beat.id}">
-                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img w-full h-48 object-cover rounded-2xl mb-4 shadow-md" alt="cover" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23333%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm0%204c1.1%200%202%20.9%202%202s-.9%202-2%202-2-.9-2-2%20.9-2%202-2zm0%2013c-2.33%200-4.31-1.46-5.11-3.5h10.22c-.8%202.04-2.78%203.5-5.11%203.5z%22%2F%3E%3C%2Fsvg%3E'">` : `<div class="w-full h-48 rounded-2xl bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center mb-4 text-4xl">🎧</div>`}
-                <div class="flex justify-between items-start">
-                    <div><h3 class="text-xl font-bold text-white">${escapeHtml(beat.title)}</h3><p class="text-sm text-cyan-300 font-mono">${beat.genre || 'Instrumental'} • ${beat.bpm} BPM</p></div>
-                    <span class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-pink-400">$${beat.price}</span>
+            <div class="glass-card p-5 beat-card">
+                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img mb-4" onerror="this.src='https://placehold.co/400x200/1a1a2e/cyan?text=🎵'">` : `<div class="h-48 rounded-2xl bg-gray-800 flex items-center justify-center mb-4 text-4xl">🎧</div>`}
+                <div class="flex justify-between">
+                    <div><h3 class="text-xl font-bold">${escapeHtml(beat.title)}</h3><p class="text-cyan-300 text-sm">${beat.genre} • ${beat.bpm} BPM</p></div>
+                    <span class="text-2xl font-bold text-pink-400">$${beat.price}</span>
                 </div>
-                <div class="wave-group my-3 justify-center opacity-80" id="wave-${beat.id}">${Array(6).fill().map(() => `<div class="wave-bar" style="height: ${12 + Math.floor(Math.random() * 18)}px"></div>`).join('')}</div>
-                <audio id="audio-${beat.id}" src="${beat.audioUrl}" preload="metadata" controls class="w-full my-2 rounded-lg" onerror="handleAudioError('${beat.id}')"></audio>
-                <div id="audioError-${beat.id}" class="audio-error hidden"></div>
-                <div class="flex gap-2 mt-2">
-                    <button onclick="togglePlayPause('${beat.id}')" id="playbtn-${beat.id}" class="flex-1 btn-outline text-cyan-300 py-2 rounded-xl text-sm font-semibold transition">▶ PLAY</button>
-                </div>
-                <div id="paypal-container-${beat.id}" class="mt-3"></div>
+                <div class="wave-group my-3" id="wave-${beat.id}">${Array(6).fill().map(() => `<div class="wave-bar" style="height: ${12+Math.random()*18}px"></div>`).join('')}</div>
+                <audio id="audio-${beat.id}" controls class="w-full my-2" preload="metadata">
+                    <source src="${beat._signedUrl || ''}" type="audio/mpeg">
+                    Your browser does not support audio.
+                </audio>
+                <div id="audioError-${beat.id}" class="text-red-400 text-xs hidden"></div>
+                <button onclick="togglePlayPause('${beat.id}')" id="playbtn-${beat.id}" class="w-full mt-2 btn-outline border border-cyan-500 text-cyan-300 py-2 rounded-xl">▶ PLAY</button>
+                <div id="paypal-${beat.id}" class="mt-3"></div>
             </div>
         `).join('');
-        beats.forEach(beat => renderPayPalButton(beat));
-        attachAudioEvents();
-    }
 
-    window.handleAudioError = (id) => {
-        const errorDiv = document.getElementById(`audioError-${id}`);
-        if (errorDiv) {
-            errorDiv.innerText = '⚠️ Audio file failed to load. Please check file or re-upload.';
-            errorDiv.classList.remove('hidden');
-        }
-    };
-
-    function attachAudioEvents() {
         beats.forEach(beat => {
             const audio = document.getElementById(`audio-${beat.id}`);
             if (audio) {
-                audio.onplay = () => updateWaveState(beat.id, true);
-                audio.onpause = () => updateWaveState(beat.id, false);
-                audio.onended = () => updateWaveState(beat.id, false);
-                audio.onerror = () => handleAudioError(beat.id);
+                audio.onerror = () => {
+                    document.getElementById(`audioError-${beat.id}`).innerText = '❌ Cannot load audio. Check filename or bucket permissions.';
+                    document.getElementById(`audioError-${beat.id}`).classList.remove('hidden');
+                };
+                audio.oncanplay = () => document.getElementById(`audioError-${beat.id}`)?.classList.add('hidden');
             }
+            renderPayPal(beat);
         });
-    }
-
-    function updateWaveState(id, isPlaying) {
-        const waveDiv = document.getElementById(`wave-${id}`);
-        const btn = document.getElementById(`playbtn-${id}`);
-        if (!waveDiv) return;
-        if (isPlaying) {
-            waveDiv.style.opacity = '1';
-            btn.innerText = '⏸ PAUSE';
-        } else {
-            waveDiv.style.opacity = '0.6';
-            btn.innerText = '▶ PLAY';
-        }
     }
 
     function togglePlayPause(id) {
         const audio = document.getElementById(`audio-${id}`);
-        if (audio.paused) {
-            document.querySelectorAll('audio').forEach(a => { if (a.id !== audio.id) a.pause(); });
-            audio.play().catch(e => {
-                console.warn(e);
-                handleAudioError(id);
-            });
-        } else {
-            audio.pause();
-        }
+        if (audio.paused) audio.play().catch(e => console.warn);
+        else audio.pause();
+        audio.onplay = () => document.getElementById(`playbtn-${id}`).innerText = '⏸ PAUSE';
+        audio.onpause = () => document.getElementById(`playbtn-${id}`).innerText = '▶ PLAY';
     }
 
-    function renderPayPalButton(beat) {
-        const container = document.getElementById(`paypal-container-${beat.id}`);
+    function renderPayPal(beat) {
+        const container = document.getElementById(`paypal-${beat.id}`);
         if (!container || !window.paypal) return;
         container.innerHTML = '';
         window.paypal.Buttons({
             createOrder: (data, actions) => actions.order.create({
-                purchase_units: [{ amount: { value: beat.price, currency_code: 'USD' }, description: `RANDYBEATS - ${beat.title}` }]
+                purchase_units: [{ amount: { value: beat.price, description: beat.title } }]
             }),
-            onApprove: (data, actions) => actions.order.capture().then(details => {
-                alert(`✅ Purchase successful! Beat "${beat.title}" will be delivered. Order: ${data.orderID}`);
-            }),
-            onError: (err) => console.error(err)
+            onApprove: (data, actions) => actions.order.capture().then(() => alert(`Purchased ${beat.title}!`))
         }).render(container);
     }
 
-    // Admin functions
-    function openAdminModal() {
-        const modal = document.getElementById('adminModal');
-        modal.classList.remove('hidden');
-        modal.classList.add('flex');
-        document.getElementById('loginScreen').classList.remove('hidden');
-        document.getElementById('adminPanel').classList.add('hidden');
-        document.getElementById('adminPassInput').value = '';
+    // Admin: handle cover upload to B2 (same as before but simplified)
+    async function uploadCoverToB2(file) {
+        const auth = await b2Authenticate();
+        const uploadUrlRes = await fetch(`${b2ApiUrl}/b2api/v2/b2_get_upload_url`, {
+            method: 'POST',
+            headers: { 'Authorization': b2AuthToken },
+            body: JSON.stringify({ bucketId: auth.allowed.bucketId })
+        });
+        const { uploadUrl, authorizationToken } = await uploadUrlRes.json();
+        const fileName = `covers/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '-')}`;
+        const arrayBuffer = await file.arrayBuffer();
+        const hash = await crypto.subtle.digest('SHA-1', arrayBuffer);
+        const sha1 = Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2,'0')).join('');
+        const res = await fetch(uploadUrl, {
+            method: 'POST',
+            headers: {
+                'Authorization': authorizationToken,
+                'X-Bz-File-Name': encodeURIComponent(fileName),
+                'Content-Type': file.type,
+                'X-Bz-Content-Sha1': sha1
+            },
+            body: arrayBuffer
+        });
+        if (!res.ok) throw new Error('Cover upload failed');
+        return `${B2_PUBLIC_URL_BASE}/${fileName}`;
     }
-    function closeAdminModal() {
-        document.getElementById('adminModal').classList.add('hidden');
-        document.getElementById('adminModal').classList.remove('flex');
+
+    // Admin form handling
+    document.getElementById('beatForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('beatId').value || Date.now().toString();
+        const title = document.getElementById('beatTitle').value.trim();
+        if (!title) return alert('Title required');
+        const audioFilename = document.getElementById('beatAudioFilename').value.trim();
+        if (!audioFilename) return alert('Enter the audio filename (e.g., beat.mp3) that is already in your B2 bucket');
+        
+        const newBeat = {
+            id,
+            title,
+            genre: document.getElementById('beatGenre').value || 'Instrumental',
+            bpm: document.getElementById('beatBpm').value || '140',
+            price: parseFloat(document.getElementById('beatPrice').value).toFixed(2),
+            audioFilename: audioFilename,
+            coverArt: document.getElementById('beatCoverUrl').value || ''
+        };
+        const existingIndex = beats.findIndex(b => b.id === id);
+        if (existingIndex !== -1) beats[existingIndex] = newBeat;
+        else beats.push(newBeat);
+        localStorage.setItem('randybeats_data', JSON.stringify(beats));
         resetAdminForm();
-    }
-    function verifyAdmin() {
-        const pwd = document.getElementById('adminPassInput').value;
-        if (pwd === ADMIN_PASSWORD) {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('adminPanel').classList.remove('hidden');
-            renderAdminList();
-        } else {
-            alert('ACCESS DENIED: Wrong password.');
+        closeAdminModal();
+        await renderStore();
+    });
+
+    // Cover upload handler
+    document.getElementById('coverFileInput')?.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const statusDiv = document.getElementById('coverStatus');
+        statusDiv.innerText = 'Uploading cover...';
+        try {
+            const url = await uploadCoverToB2(file);
+            document.getElementById('beatCoverUrl').value = url;
+            document.getElementById('coverZoneContent').innerHTML = `<img src="${URL.createObjectURL(file)}" class="h-16 mx-auto rounded">`;
+            statusDiv.innerText = '✅ Cover uploaded';
+        } catch(err) {
+            statusDiv.innerText = 'Cover upload failed: ' + err.message;
         }
-    }
+    });
+
+    document.getElementById('coverUploadZone')?.addEventListener('click', () => {
+        document.getElementById('coverFileInput').click();
+    });
 
     function renderAdminList() {
         const listDiv = document.getElementById('adminBeatList');
-        if (!beats.length) {
-            listDiv.innerHTML = '<div class="text-gray-500 text-center py-4 italic">No beats — add your first track.</div>';
-            return;
-        }
+        if (!beats.length) { listDiv.innerHTML = '<p class="text-gray-500">No beats</p>'; return; }
         listDiv.innerHTML = beats.map(beat => `
-            <div class="flex justify-between items-center bg-white/5 rounded-2xl p-3 border border-white/10">
-                <div class="flex items-center gap-3">
-                    ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-10 h-10 rounded-lg object-cover" onerror="this.src='data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23666%22%3E%3Cpath%20d%3D%22M12%202C6.48%202%202%206.48%202%2012s4.48%2010%2010%2010%2010-4.48%2010-10S17.52%202%2012%202zm0%204c1.1%200%202%20.9%202%202s-.9%202-2%202-2-.9-2-2%20.9-2%202-2zm0%2013c-2.33%200-4.31-1.46-5.11-3.5h10.22c-.8%202.04-2.78%203.5-5.11%203.5z%22%2F%3E%3C%2Fsvg%3E'">` : `<div class="w-10 h-10 rounded-lg bg-gray-700 flex items-center justify-center">🎵</div>`}
-                    <div><p class="font-bold text-white text-sm">${beat.title}</p><p class="text-xs text-cyan-300">$${beat.price}</p></div>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="editBeatById('${beat.id}')" class="text-xs bg-cyan-500/20 hover:bg-cyan-500/40 px-3 py-1 rounded-full text-cyan-300">✏️ Edit</button>
-                    <button onclick="deleteBeatById('${beat.id}')" class="text-xs bg-red-500/20 hover:bg-red-500/40 px-3 py-1 rounded-full text-red-300">🗑️</button>
-                </div>
+            <div class="flex justify-between items-center bg-white/5 p-3 rounded-xl">
+                <div><strong>${beat.title}</strong><br><span class="text-xs text-gray-400">${beat.audioFilename}</span></div>
+                <div><button onclick="editBeat('${beat.id}')" class="text-cyan-300 text-sm mr-2">Edit</button><button onclick="deleteBeat('${beat.id}')" class="text-red-400 text-sm">Del</button></div>
             </div>
         `).join('');
     }
 
-    window.editBeatById = (id) => {
+    window.editBeat = (id) => {
         const beat = beats.find(b => b.id === id);
         if (!beat) return;
         document.getElementById('beatId').value = beat.id;
         document.getElementById('beatTitle').value = beat.title;
-        document.getElementById('beatGenre').value = beat.genre || '';
+        document.getElementById('beatGenre').value = beat.genre;
         document.getElementById('beatBpm').value = beat.bpm;
         document.getElementById('beatPrice').value = beat.price;
-        document.getElementById('beatAudioUrl').value = beat.audioUrl;
+        document.getElementById('beatAudioFilename').value = beat.audioFilename;
         document.getElementById('beatCoverUrl').value = beat.coverArt || '';
-        const audioZoneDiv = document.getElementById('audioZoneContent');
-        if (beat.audioUrl) audioZoneDiv.innerHTML = `<div class="text-green-400">✓ Audio already uploaded</div>`;
-        const coverDiv = document.getElementById('coverZoneContent');
-        if (beat.coverArt) coverDiv.innerHTML = `<img src="${beat.coverArt}" class="w-12 h-12 rounded-lg mx-auto object-cover border border-cyan-400"><p class="text-[10px]">current</p>`;
+        if (beat.coverArt) document.getElementById('coverZoneContent').innerHTML = `<img src="${beat.coverArt}" class="h-16 mx-auto rounded">`;
     };
-    window.deleteBeatById = (id) => {
-        if (confirm('Delete this beat permanently?')) {
+    window.deleteBeat = (id) => {
+        if (confirm('Delete beat?')) {
             beats = beats.filter(b => b.id !== id);
             localStorage.setItem('randybeats_data', JSON.stringify(beats));
-            renderStore();
             renderAdminList();
+            renderStore();
         }
     };
     function resetAdminForm() {
         document.getElementById('beatForm').reset();
         document.getElementById('beatId').value = '';
-        document.getElementById('beatAudioUrl').value = '';
         document.getElementById('beatCoverUrl').value = '';
-        document.getElementById('audioZoneContent').innerHTML = `<div class="text-2xl">🎵</div><p class="text-xs text-cyan-300 mt-1">Click to upload audio</p>`;
-        document.getElementById('coverZoneContent').innerHTML = `<div class="text-2xl">🖼️</div><p class="text-xs text-cyan-300 mt-1">Upload cover</p>`;
-        document.getElementById('audioProgressBar').classList.add('hidden');
-        document.getElementById('coverProgressBar').classList.add('hidden');
-        document.getElementById('audioStatusMsg').innerHTML = '';
-        document.getElementById('coverStatusMsg').innerHTML = '';
+        document.getElementById('coverZoneContent').innerHTML = '📸 Click to upload cover';
     }
-
-    document.getElementById('beatForm').addEventListener('submit', (e) => {
-        e.preventDefault();
-        const id = document.getElementById('beatId').value || Date.now().toString();
-        const title = document.getElementById('beatTitle').value.trim();
-        if (!title) return alert('Beat title required');
-        const audioUrl = document.getElementById('beatAudioUrl').value;
-        const existingBeat = beats.find(b => b.id === id);
-        if (!audioUrl && (!existingBeat || !existingBeat.audioUrl)) {
-            return alert('Please upload an audio file first.');
-        }
-        const newBeat = {
-            id: id,
-            title: title,
-            genre: document.getElementById('beatGenre').value || 'Hip Hop',
-            bpm: document.getElementById('beatBpm').value || '140',
-            price: parseFloat(document.getElementById('beatPrice').value).toFixed(2),
-            audioUrl: audioUrl || existingBeat.audioUrl,
-            coverArt: document.getElementById('beatCoverUrl').value || (existingBeat ? existingBeat.coverArt : '')
-        };
-        const existingIdx = beats.findIndex(b => b.id === id);
-        if (existingIdx !== -1) beats[existingIdx] = newBeat;
-        else beats.push(newBeat);
-        localStorage.setItem('randybeats_data', JSON.stringify(beats));
-        renderStore();
-        renderAdminList();
+    function openAdminModal() {
+        document.getElementById('adminModal').classList.remove('hidden');
+        document.getElementById('adminModal').classList.add('flex');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('adminPanel').classList.add('hidden');
+    }
+    function closeAdminModal() {
+        document.getElementById('adminModal').classList.add('hidden');
         resetAdminForm();
-        closeAdminModal();
-    });
-
-    function escapeHtml(str) { return String(str).replace(/[&<>]/g, function(m){if(m==='&') return '&amp;'; if(m==='<') return '&lt;'; if(m==='>') return '&gt;'; return m;}); }
+    }
+    function verifyAdmin() {
+        if (document.getElementById('adminPassInput').value === ADMIN_PASSWORD) {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('adminPanel').classList.remove('hidden');
+            renderAdminList();
+        } else alert('Wrong password');
+    }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[m];}); }
 
     renderStore();
     document.getElementById('adminModal').addEventListener('click', (e) => { if (e.target === document.getElementById('adminModal')) closeAdminModal(); });
