@@ -7,11 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
             background: #0a0804;
@@ -19,7 +15,6 @@
             min-height: 100vh;
             overflow-x: hidden;
         }
-        /* Canvas background */
         #gold-canvas {
             position: fixed;
             top: 0;
@@ -29,7 +24,6 @@
             z-index: -1;
             display: block;
         }
-        /* Glass card for admin */
         .glass-card {
             background: rgba(20, 18, 12, 0.75);
             backdrop-filter: blur(12px);
@@ -38,10 +32,7 @@
             box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.5);
             transition: all 0.3s ease;
         }
-        .glass-card:hover {
-            border-color: #d4af37;
-            box-shadow: 0 25px 40px -15px rgba(212, 175, 55, 0.3);
-        }
+        .glass-card:hover { border-color: #d4af37; }
         input, textarea, select {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(212, 175, 55, 0.4);
@@ -49,13 +40,8 @@
             padding: 10px 14px;
             color: #f5f0e0;
             width: 100%;
-            transition: 0.2s;
         }
-        input:focus, textarea:focus {
-            outline: none;
-            border-color: #ffd700;
-            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-        }
+        input:focus, textarea:focus { outline: none; border-color: #ffd700; }
         button {
             background: rgba(212, 175, 55, 0.2);
             border: 1px solid #d4af37;
@@ -63,450 +49,130 @@
             padding: 10px 20px;
             font-weight: 600;
             cursor: pointer;
-            transition: 0.2s;
             color: #f5e6b0;
         }
-        button:hover {
-            background: rgba(212, 175, 55, 0.4);
-            border-color: #ffd700;
-            color: white;
-        }
-        .delete-btn {
-            background: rgba(180, 50, 50, 0.3);
-            border-color: #b8860b;
-        }
-        .delete-btn:hover {
-            background: rgba(200, 60, 60, 0.6);
-            border-color: #ffaa00;
-        }
+        button:hover { background: rgba(212, 175, 55, 0.4); border-color: #ffd700; color: white; }
+        .delete-btn { background: rgba(180, 50, 50, 0.3); border-color: #b8860b; }
+        .delete-btn:hover { background: rgba(200, 60, 60, 0.6); }
         .upload-zone {
             border: 2px dashed rgba(212, 175, 55, 0.5);
             border-radius: 20px;
             padding: 20px;
             text-align: center;
             cursor: pointer;
-            transition: 0.2s;
         }
-        .upload-zone:hover {
-            border-color: #ffd700;
-            background: rgba(212, 175, 55, 0.05);
-        }
-        .cover-preview {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 16px;
-            border: 1px solid #d4af37;
-        }
-        ::-webkit-scrollbar {
-            width: 5px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #1a150c;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d4af37;
-            border-radius: 10px;
-        }
+        .upload-zone:hover { border-color: #ffd700; background: rgba(212, 175, 55, 0.05); }
+        .cover-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 16px; border: 1px solid #d4af37; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #1a150c; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
 <body>
-
-    <canvas id="gold-canvas"></canvas>
-
-    <div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
-        <!-- Header -->
-        <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
-            <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
-            <button onclick="logout()" class="admin-logout-btn">🚪 Logout</button>
-        </div>
-
-        <!-- Add Beat Button -->
-        <div class="mb-8">
-            <button onclick="openAddModal()" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
-        </div>
-
-        <!-- Beats Grid -->
-        <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+<canvas id="gold-canvas"></canvas>
+<div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
+    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
+        <button onclick="logout()" class="admin-logout-btn">🚪 Logout</button>
     </div>
+    <div class="mb-8">
+        <button onclick="openAddModal()" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
+    </div>
+    <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+</div>
 
-    <!-- Modal for Add/Edit Beat -->
-    <div id="beatModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-        <div class="glass-card max-w-lg w-full p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 id="modalTitle" class="text-2xl font-bold text-amber-300">Add New Beat</h2>
-                <button onclick="closeModal()" class="text-gray-400 text-2xl">&times;</button>
+<!-- Modal -->
+<div id="beatModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="glass-card max-w-lg w-full p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 id="modalTitle" class="text-2xl font-bold text-amber-300">Add New Beat</h2>
+            <button onclick="closeModal()" class="text-gray-400 text-2xl">&times;</button>
+        </div>
+        <form id="beatForm">
+            <input type="hidden" id="beatId">
+            <div class="mb-3"><label class="block text-sm mb-1">Title *</label><input type="text" id="title" required></div>
+            <div class="grid grid-cols-2 gap-3 mb-3">
+                <div><label class="block text-sm mb-1">Genre</label><input type="text" id="genre" placeholder="Trap, Drill..."></div>
+                <div><label class="block text-sm mb-1">BPM</label><input type="number" id="bpm" placeholder="140"></div>
             </div>
-            <form id="beatForm">
-                <input type="hidden" id="beatId">
-                <div class="mb-3">
-                    <label class="block text-sm mb-1 text-amber-200">Title *</label>
-                    <input type="text" id="title" required>
-                </div>
-                <div class="grid grid-cols-2 gap-3 mb-3">
-                    <div>
-                        <label class="block text-sm mb-1 text-amber-200">Genre</label>
-                        <input type="text" id="genre" placeholder="Trap, Drill, etc.">
-                    </div>
-                    <div>
-                        <label class="block text-sm mb-1 text-amber-200">BPM</label>
-                        <input type="number" id="bpm" placeholder="140">
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <label class="block text-sm mb-1 text-amber-200">Price (USD) *</label>
-                    <input type="number" step="0.01" id="price" required>
-                </div>
-                <div class="mb-3">
-                    <label class="block text-sm mb-1 text-amber-200">Audio URL (catbox.moe WAV link) *</label>
-                    <input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required>
-                    <p class="text-xs text-amber-400/60 mt-1">Upload your WAV to <a href="https://catbox.moe" target="_blank" class="text-yellow-400 underline">catbox.moe</a> and paste the link here.</p>
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm mb-1 text-amber-200">Cover Art (optional)</label>
-                    <div id="coverUploadZone" class="upload-zone">
-                        <input type="file" id="coverFile" accept="image/jpeg,image/png,image/webp" class="hidden">
-                        <div id="coverPreview" class="text-center">
-                            <div class="text-3xl mb-1">🖼️</div>
-                            <p class="text-sm">Click to upload cover image</p>
-                        </div>
-                    </div>
-                    <input type="hidden" id="coverUrl">
-                    <div id="uploadStatus" class="text-xs mt-1 text-amber-300"></div>
-                </div>
-                <div class="flex gap-3">
-                    <button type="submit" class="flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold py-3 rounded-xl">Save Beat</button>
-                    <button type="button" onclick="closeModal()" class="px-5 border border-gray-600 rounded-xl">Cancel</button>
-                </div>
-            </form>
-        </div>
+            <div class="mb-3"><label class="block text-sm mb-1">Tags (comma separated, e.g. dark, melodic)</label><input type="text" id="tags" placeholder="dark, piano, aggressive"></div>
+            <div class="mb-3"><label class="block text-sm mb-1">Price (USD) *</label><input type="number" step="0.01" id="price" required></div>
+            <div class="mb-3"><label class="block text-sm mb-1">Audio URL (preview / full WAV) *</label><input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required><p class="text-xs text-amber-400/60 mt-1">Upload to catbox.moe and paste link.</p></div>
+            <div class="mb-4">
+                <label class="block text-sm mb-1">Cover Art (optional)</label>
+                <div id="coverUploadZone" class="upload-zone"><input type="file" id="coverFile" accept="image/*" class="hidden"><div id="coverPreview" class="text-center"><div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload</p></div></div>
+                <input type="hidden" id="coverUrl"><div id="uploadStatus" class="text-xs mt-1"></div>
+            </div>
+            <div class="flex gap-3">
+                <button type="submit" class="flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold py-3 rounded-xl">Save Beat</button>
+                <button type="button" onclick="closeModal()" class="px-5 border border-gray-600 rounded-xl">Cancel</button>
+            </div>
+        </form>
     </div>
+</div>
 
-    <script>
-        // ==================== GOLD BAR CANVAS BACKGROUND (same as index) ====================
-        const canvas = document.getElementById('gold-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let goldBars = [];
-        let particles = [];
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
+<script>
+    // ==================== GOLD CANVAS (same as index) ====================
+    const canvas = document.getElementById('gold-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, goldBars = [], particles = [], mouseX=0, mouseY=0, targetX=0, targetY=0;
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    window.addEventListener('resize', () => { resizeCanvas(); initGoldBars(); initParticles(); });
+    window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; mouseX = mouseX*0.95+targetX*0.05; mouseY = mouseY*0.95+targetY*0.05; });
+    class GoldBar { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.w = Math.random()*60+30; this.h = Math.random()*15+8; this.angle = Math.random()*Math.PI*2; this.rotSpeed = (Math.random()-0.5)*0.005; this.moveX = (Math.random()-0.5)*0.3; this.moveY = (Math.random()-0.5)*0.2; this.opacity = Math.random()*0.25+0.1; }
+    update() { let dx = this.x - mouseX, dy = this.y - mouseY, dist = Math.hypot(dx,dy); if(dist<120){ let angle = Math.atan2(dy,dx), force = (120-dist)/120*0.8; this.x += Math.cos(angle)*force; this.y += Math.sin(angle)*force; } this.x += this.moveX; this.y += this.moveY; this.angle += this.rotSpeed; if(this.x<-100) this.x=width+100; if(this.x>width+100) this.x=-100; if(this.y<-100) this.y=height+100; if(this.y>height+100) this.y=-100; }
+    draw() { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle); let grad = ctx.createLinearGradient(-this.w/2,-this.h/2,this.w/2,this.h/2); grad.addColorStop(0,`rgba(212,175,55,${this.opacity*0.8})`); grad.addColorStop(0.5,`rgba(255,215,0,${this.opacity})`); grad.addColorStop(1,`rgba(184,134,11,${this.opacity*0.7})`); ctx.fillStyle=grad; ctx.shadowBlur=12; ctx.shadowColor=`rgba(212,175,55,${this.opacity*0.6})`; ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h); ctx.strokeStyle=`rgba(255,235,140,${this.opacity*0.8})`; ctx.lineWidth=1; ctx.strokeRect(-this.w/2,-this.h/2,this.w,this.h); ctx.restore(); } }
+    class GoldParticle { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.size = Math.random()*2+0.8; this.speedX = (Math.random()-0.5)*0.2; this.speedY = (Math.random()-0.5)*0.15; this.alpha = Math.random()*0.4+0.15; }
+    update() { this.x += this.speedX; this.y += this.speedY; if(this.x<0) this.x=width; if(this.x>width) this.x=0; if(this.y<0) this.y=height; if(this.y>height) this.y=0; }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(255,215,0,${this.alpha})`; ctx.fill(); } }
+    function initGoldBars() { goldBars = []; let barCount = Math.min(35, Math.floor(width/80)); for(let i=0;i<barCount;i++) goldBars.push(new GoldBar()); }
+    function initParticles() { particles = []; let particleCount = Math.min(200, Math.floor(width*height/12000)); for(let i=0;i<particleCount;i++) particles.push(new GoldParticle()); }
+    function drawBackground() { let grad = ctx.createLinearGradient(0,0,width,height); grad.addColorStop(0,'#0a0804'); grad.addColorStop(0.5,'#1c160c'); grad.addColorStop(1,'#0d0a05'); ctx.fillStyle=grad; ctx.fillRect(0,0,width,height); let radGrad = ctx.createRadialGradient(width/2,height/2,50,width/2,height/2,width/1.2); radGrad.addColorStop(0,'rgba(212,175,55,0.05)'); radGrad.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=radGrad; ctx.fillRect(0,0,width,height); }
+    function animate() { if(!ctx) return; drawBackground(); for(let bar of goldBars) { bar.update(); bar.draw(); } for(let p of particles) { p.update(); p.draw(); } requestAnimationFrame(animate); }
+    function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
+    startCanvas();
 
-        function resizeCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
-        }
+    // ==================== ADMIN LOGIC ====================
+    const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
+    const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
+    const ADMIN_PASSWORD = "randybeats2025";
+    const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";
+    let beats = [];
 
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initGoldBars();
-            initParticles();
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            targetX = e.clientX;
-            targetY = e.clientY;
-            mouseX = mouseX * 0.95 + targetX * 0.05;
-            mouseY = mouseY * 0.95 + targetY * 0.05;
-        });
-
-        class GoldBar {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.w = Math.random() * 60 + 30;
-                this.h = Math.random() * 15 + 8;
-                this.angle = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.005;
-                this.moveX = (Math.random() - 0.5) * 0.3;
-                this.moveY = (Math.random() - 0.5) * 0.2;
-                this.opacity = Math.random() * 0.25 + 0.1;
-            }
-            update() {
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 120) {
-                    const angle = Math.atan2(dy, dx);
-                    const force = (120 - dist) / 120 * 0.8;
-                    this.x += Math.cos(angle) * force;
-                    this.y += Math.sin(angle) * force;
-                }
-                this.x += this.moveX;
-                this.y += this.moveY;
-                this.angle += this.rotSpeed;
-                if (this.x < -100) this.x = width + 100;
-                if (this.x > width + 100) this.x = -100;
-                if (this.y < -100) this.y = height + 100;
-                if (this.y > height + 100) this.y = -100;
-            }
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-                const grad = ctx.createLinearGradient(-this.w/2, -this.h/2, this.w/2, this.h/2);
-                grad.addColorStop(0, `rgba(212, 175, 55, ${this.opacity * 0.8})`);
-                grad.addColorStop(0.5, `rgba(255, 215, 0, ${this.opacity})`);
-                grad.addColorStop(1, `rgba(184, 134, 11, ${this.opacity * 0.7})`);
-                ctx.fillStyle = grad;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = `rgba(212, 175, 55, ${this.opacity * 0.6})`;
-                ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
-                ctx.strokeStyle = `rgba(255, 235, 140, ${this.opacity * 0.8})`;
-                ctx.lineWidth = 1;
-                ctx.strokeRect(-this.w/2, -this.h/2, this.w, this.h);
-                ctx.restore();
-            }
-        }
-
-        class GoldParticle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 2 + 0.8;
-                this.speedX = (Math.random() - 0.5) * 0.2;
-                this.speedY = (Math.random() - 0.5) * 0.15;
-                this.alpha = Math.random() * 0.4 + 0.15;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 215, 0, ${this.alpha})`;
-                ctx.fill();
-            }
-        }
-
-        function initGoldBars() {
-            goldBars = [];
-            const barCount = Math.min(35, Math.floor(width / 80));
-            for (let i = 0; i < barCount; i++) {
-                goldBars.push(new GoldBar());
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const particleCount = Math.min(200, Math.floor(width * height / 12000));
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new GoldParticle());
-            }
-        }
-
-        function drawBackground() {
-            const grad = ctx.createLinearGradient(0, 0, width, height);
-            grad.addColorStop(0, '#0a0804');
-            grad.addColorStop(0.5, '#1c160c');
-            grad.addColorStop(1, '#0d0a05');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, width, height);
-            const radGrad = ctx.createRadialGradient(width/2, height/2, 50, width/2, height/2, width/1.2);
-            radGrad.addColorStop(0, 'rgba(212,175,55,0.05)');
-            radGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = radGrad;
-            ctx.fillRect(0, 0, width, height);
-        }
-
-        function animate() {
-            if (!ctx) return;
-            drawBackground();
-            for (let bar of goldBars) {
-                bar.update();
-                bar.draw();
-            }
-            for (let p of particles) {
-                p.update();
-                p.draw();
-            }
-            requestAnimationFrame(animate);
-        }
-
-        function startCanvas() {
-            resizeCanvas();
-            initGoldBars();
-            initParticles();
-            animate();
-        }
-
-        startCanvas();
-
-        // ==================== ADMIN LOGIC (unchanged, with gold theme) ====================
-        const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
-        const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
-        const ADMIN_PASSWORD = "randybeats2025";
-        const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";
-
-        let beats = [];
-
-        function checkAuth() {
-            const session = sessionStorage.getItem('adminAuth');
-            if (session !== 'true') {
-                const pwd = prompt("Enter admin password:");
-                if (pwd === ADMIN_PASSWORD) {
-                    sessionStorage.setItem('adminAuth', 'true');
-                    loadBeats();
-                } else {
-                    document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><div class="glass-card p-8 text-center"><h1 class="text-2xl mb-4">Access Denied</h1><button onclick="location.reload()" class="bg-amber-600 px-4 py-2 rounded">Try Again</button></div></div>';
-                }
-            } else {
-                loadBeats();
-            }
-        }
-
-        async function loadBeats() {
-            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            const data = await res.json();
-            beats = data.record || [];
-            renderBeats();
-        }
-
-        async function saveBeats() {
-            await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY },
-                body: JSON.stringify(beats)
-            });
-        }
-
-        function renderBeats() {
-            const grid = document.getElementById('beatsGrid');
-            if (!beats.length) {
-                grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">No beats yet. Click "+ Add New Beat" to start.</div>';
-                return;
-            }
-            grid.innerHTML = beats.map(beat => `
-                <div class="glass-card p-4">
-                    <div class="flex gap-3">
-                        ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-16 h-16 rounded-xl object-cover border border-amber-500">` : `<div class="w-16 h-16 bg-black/50 rounded-xl flex items-center justify-center text-2xl">🎧</div>`}
-                        <div class="flex-1">
-                            <h3 class="font-bold text-lg text-amber-100">${escapeHtml(beat.title)}</h3>
-                            <p class="text-sm text-amber-400">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p>
-                            <p class="text-yellow-400 font-bold">$${beat.price}</p>
-                        </div>
-                    </div>
-                    <div class="flex gap-2 mt-3">
-                        <button onclick="editBeat('${beat.id}')" class="flex-1 bg-amber-600/20 hover:bg-amber-600/40 py-2 rounded-lg text-sm">Edit</button>
-                        <button onclick="deleteBeat('${beat.id}')" class="flex-1 delete-btn py-2 rounded-lg text-sm">Delete</button>
-                    </div>
+    function checkAuth() {
+        if (sessionStorage.getItem('adminAuth') !== 'true') {
+            const pwd = prompt("Enter admin password:");
+            if (pwd === ADMIN_PASSWORD) { sessionStorage.setItem('adminAuth','true'); loadBeats(); }
+            else { document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><div class="glass-card p-8 text-center"><h1 class="text-2xl mb-4">Access Denied</h1><button onclick="location.reload()" class="bg-amber-600 px-4 py-2 rounded">Try Again</button></div></div>'; }
+        } else { loadBeats(); }
+    }
+    async function loadBeats() { const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } }); const data = await res.json(); beats = data.record || []; renderBeats(); }
+    async function saveBeats() { await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY }, body: JSON.stringify(beats) }); }
+    function renderBeats() {
+        const grid = document.getElementById('beatsGrid');
+        if (!beats.length) { grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">No beats yet. Click "+ Add New Beat" to start.</div>'; return; }
+        grid.innerHTML = beats.map(beat => `
+            <div class="glass-card p-4">
+                <div class="flex gap-3">
+                    ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-16 h-16 rounded-xl object-cover border border-amber-500">` : `<div class="w-16 h-16 bg-black/50 rounded-xl flex items-center justify-center text-2xl">🎧</div>`}
+                    <div class="flex-1"><h3 class="font-bold text-lg text-amber-100">${escapeHtml(beat.title)}</h3><p class="text-sm text-amber-400">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p><p class="text-yellow-400 font-bold">$${beat.price}</p>${beat.tags ? `<p class="text-xs text-gray-400">${escapeHtml(beat.tags)}</p>` : ''}</div>
                 </div>
-            `).join('');
-        }
-
-        window.editBeat = (id) => {
-            const beat = beats.find(b => b.id === id);
-            if (!beat) return;
-            document.getElementById('modalTitle').innerText = 'Edit Beat';
-            document.getElementById('beatId').value = beat.id;
-            document.getElementById('title').value = beat.title;
-            document.getElementById('genre').value = beat.genre || '';
-            document.getElementById('bpm').value = beat.bpm;
-            document.getElementById('price').value = beat.price;
-            document.getElementById('audioUrl').value = beat.audioUrl;
-            document.getElementById('coverUrl').value = beat.coverArt || '';
-            if (beat.coverArt) {
-                document.getElementById('coverPreview').innerHTML = `<img src="${beat.coverArt}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-amber-300">Current cover</p>`;
-            } else {
-                document.getElementById('coverPreview').innerHTML = '<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>';
-            }
-            openModal();
-        };
-
-        window.deleteBeat = async (id) => {
-            if (confirm('Delete this beat permanently?')) {
-                beats = beats.filter(b => b.id !== id);
-                await saveBeats();
-                renderBeats();
-            }
-        };
-
-        async function uploadCover(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-            formData.append('key', IMGBB_API_KEY);
-            const res = await fetch('https://api.imgbb.com/1/upload', {
-                method: 'POST',
-                body: formData
-            });
-            const data = await res.json();
-            if (!data.success) throw new Error(data.error?.message || 'Upload failed');
-            return data.data.url;
-        }
-
-        document.getElementById('coverUploadZone').addEventListener('click', () => {
-            document.getElementById('coverFile').click();
-        });
-        document.getElementById('coverFile').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            const statusDiv = document.getElementById('uploadStatus');
-            statusDiv.innerText = 'Uploading cover...';
-            statusDiv.style.color = '#f5e6b0';
-            try {
-                const url = await uploadCover(file);
-                document.getElementById('coverUrl').value = url;
-                document.getElementById('coverPreview').innerHTML = `<img src="${url}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-green-400">Cover uploaded ✓</p>`;
-                statusDiv.innerText = '';
-            } catch (err) {
-                statusDiv.innerText = 'Upload failed: ' + err.message;
-                statusDiv.style.color = '#ff8888';
-            }
-        });
-
-        document.getElementById('beatForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('beatId').value || Date.now().toString();
-            const title = document.getElementById('title').value.trim();
-            if (!title) return alert('Title required');
-            const audioUrl = document.getElementById('audioUrl').value.trim();
-            if (!audioUrl) return alert('Audio URL required');
-
-            const newBeat = {
-                id: id,
-                title: title,
-                genre: document.getElementById('genre').value.trim() || 'Instrumental',
-                bpm: document.getElementById('bpm').value || '140',
-                price: parseFloat(document.getElementById('price').value).toFixed(2),
-                audioUrl: audioUrl,
-                coverArt: document.getElementById('coverUrl').value || ''
-            };
-
-            const existingIndex = beats.findIndex(b => b.id === id);
-            if (existingIndex !== -1) beats[existingIndex] = newBeat;
-            else beats.push(newBeat);
-
-            await saveBeats();
-            renderBeats();
-            closeModal();
-            alert('Beat saved!');
-        });
-
-        function openAddModal() {
-            document.getElementById('modalTitle').innerText = 'Add New Beat';
-            document.getElementById('beatForm').reset();
-            document.getElementById('beatId').value = '';
-            document.getElementById('coverUrl').value = '';
-            document.getElementById('coverPreview').innerHTML = '<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>';
-            document.getElementById('uploadStatus').innerText = '';
-            openModal();
-        }
-
-        function openModal() { document.getElementById('beatModal').classList.remove('hidden'); document.getElementById('beatModal').classList.add('flex'); }
-        function closeModal() { document.getElementById('beatModal').classList.add('hidden'); document.getElementById('beatModal').classList.remove('flex'); }
-        function logout() { sessionStorage.removeItem('adminAuth'); location.reload(); }
-        function escapeHtml(str) { return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-
-        checkAuth();
-    </script>
+                <div class="flex gap-2 mt-3"><button onclick="editBeat('${beat.id}')" class="flex-1 bg-amber-600/20 hover:bg-amber-600/40 py-2 rounded-lg text-sm">Edit</button><button onclick="deleteBeat('${beat.id}')" class="flex-1 delete-btn py-2 rounded-lg text-sm">Delete</button></div>
+            </div>
+        `).join('');
+    }
+    window.editBeat = (id) => { const beat = beats.find(b=>b.id===id); if(!beat) return; document.getElementById('modalTitle').innerText='Edit Beat'; document.getElementById('beatId').value=beat.id; document.getElementById('title').value=beat.title; document.getElementById('genre').value=beat.genre||''; document.getElementById('bpm').value=beat.bpm; document.getElementById('price').value=beat.price; document.getElementById('audioUrl').value=beat.audioUrl; document.getElementById('tags').value=beat.tags||''; document.getElementById('coverUrl').value=beat.coverArt||''; if(beat.coverArt) document.getElementById('coverPreview').innerHTML=`<img src="${beat.coverArt}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-amber-300">Current cover</p>`; else document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; openModal(); };
+    window.deleteBeat = async (id) => { if(confirm('Delete this beat?')) { beats = beats.filter(b=>b.id!==id); await saveBeats(); renderBeats(); } };
+    async function uploadCover(file) { const fd = new FormData(); fd.append('image',file); fd.append('key',IMGBB_API_KEY); const res = await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}); const data = await res.json(); if(!data.success) throw new Error(data.error?.message); return data.data.url; }
+    document.getElementById('coverUploadZone').addEventListener('click',()=>document.getElementById('coverFile').click());
+    document.getElementById('coverFile').addEventListener('change',async(e)=>{ const file=e.target.files[0]; if(!file) return; const status=document.getElementById('uploadStatus'); status.innerText='Uploading...'; try{ const url=await uploadCover(file); document.getElementById('coverUrl').value=url; document.getElementById('coverPreview').innerHTML=`<img src="${url}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-green-400">✓ Uploaded</p>`; status.innerText=''; } catch(err){ status.innerText='Upload failed'; } });
+    document.getElementById('beatForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const id = document.getElementById('beatId').value || Date.now().toString(); const title = document.getElementById('title').value.trim(); if(!title) return alert('Title required'); const audioUrl = document.getElementById('audioUrl').value.trim(); if(!audioUrl) return alert('Audio URL required'); const newBeat = { id, title, genre: document.getElementById('genre').value.trim()||'Instrumental', bpm: document.getElementById('bpm').value||'140', price: parseFloat(document.getElementById('price').value).toFixed(2), audioUrl, coverArt: document.getElementById('coverUrl').value||'', tags: document.getElementById('tags').value.trim()||'' }; const idx = beats.findIndex(b=>b.id===id); if(idx!==-1) beats[idx]=newBeat; else beats.push(newBeat); await saveBeats(); renderBeats(); closeModal(); alert('Beat saved!'); });
+    function openAddModal() { document.getElementById('modalTitle').innerText='Add New Beat'; document.getElementById('beatForm').reset(); document.getElementById('beatId').value=''; document.getElementById('coverUrl').value=''; document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; document.getElementById('uploadStatus').innerText=''; openModal(); }
+    function openModal() { document.getElementById('beatModal').classList.remove('hidden'); document.getElementById('beatModal').classList.add('flex'); }
+    function closeModal() { document.getElementById('beatModal').classList.add('hidden'); }
+    function logout() { sessionStorage.removeItem('adminAuth'); location.reload(); }
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    checkAuth();
+</script>
 </body>
 </html>
