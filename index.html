@@ -3,24 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>RANDYBEATS | Gold Standard</title>
+    <title>RANDYBEATS | Premium Beats</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=AdA9_iV1iAS2sxMJZCT3-Bx1xpdF5U7N2oQalAkZnCjX7BtlAdfpfDl3KHuvW9gQkUeGHoaO0vMcYm11&currency=USD"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Inter', sans-serif;
+            background: #0a0804;
             color: #f5f0e0;
             min-height: 100vh;
             overflow-x: hidden;
-            background: #0a0804;
         }
-        /* Canvas background */
         #gold-canvas {
             position: fixed;
             top: 0;
@@ -30,13 +25,12 @@
             z-index: -1;
             display: block;
         }
-        /* Glass cards with rich gold accents */
         .beat-card {
             background: rgba(20, 18, 12, 0.7);
             backdrop-filter: blur(14px);
             border-radius: 28px;
             border: 1px solid rgba(212, 175, 55, 0.4);
-            transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            transition: all 0.4s;
             overflow: hidden;
             box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.6);
         }
@@ -49,11 +43,9 @@
             width: 100%;
             height: 210px;
             object-fit: cover;
-            transition: transform 0.5s ease;
+            transition: transform 0.5s;
         }
-        .beat-card:hover .cover-img {
-            transform: scale(1.03);
-        }
+        .beat-card:hover .cover-img { transform: scale(1.03); }
         .placeholder-cover {
             width: 100%;
             height: 210px;
@@ -64,13 +56,11 @@
             font-size: 3rem;
         }
         .preview-btn {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(212, 175, 55, 0.6);
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.6);
             border-radius: 60px;
             padding: 10px 0;
             font-weight: 700;
-            font-size: 0.9rem;
-            transition: all 0.25s;
             cursor: pointer;
             width: 100%;
             color: #f5e6b0;
@@ -78,23 +68,20 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            backdrop-filter: blur(4px);
         }
         .preview-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
+            background: rgba(212,175,55,0.2);
             border-color: #ffd700;
             color: white;
-            transform: scale(0.98);
         }
         .preview-btn.playing {
-            background: rgba(212, 175, 55, 0.3);
-            border-color: #ffd700;
+            background: rgba(212,175,55,0.3);
             animation: pulseGold 1s infinite;
         }
         @keyframes pulseGold {
-            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.5); }
-            70% { box-shadow: 0 0 0 8px rgba(212, 175, 55, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(212,175,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
         }
         .progress-bar {
             width: 100%;
@@ -116,12 +103,6 @@
             color: #d4af37;
             text-align: right;
         }
-        .error-msg {
-            font-size: 11px;
-            color: #ff8888;
-            text-align: center;
-            margin-top: 8px;
-        }
         .price {
             background: linear-gradient(135deg, #ffd700, #b8860b);
             background-clip: text;
@@ -129,408 +110,359 @@
             color: transparent;
             font-weight: 800;
             font-size: 1.8rem;
-            letter-spacing: -0.02em;
-            text-shadow: 0 0 8px rgba(255,215,0,0.3);
         }
-        .genre-badge {
-            background: rgba(212, 175, 55, 0.2);
+        .genre-badge, .tag-badge {
+            background: rgba(212,175,55,0.2);
             border-radius: 30px;
             padding: 3px 12px;
             font-size: 0.7rem;
             font-weight: 600;
             color: #ffd700;
-            border: 0.5px solid rgba(212,175,55,0.4);
+            display: inline-block;
+        }
+        .filter-panel {
+            background: rgba(20,18,12,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            border: 1px solid rgba(212,175,55,0.3);
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        input, select {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.4);
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: #f5f0e0;
+            width: 100%;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #ffd700;
         }
         .admin-btn {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(8px);
-            border: 1px solid rgba(212, 175, 55, 0.5);
-            transition: 0.2s;
+            border: 1px solid rgba(212,175,55,0.5);
             border-radius: 40px;
             padding: 8px 20px;
             font-weight: 500;
             color: #f5e6b0;
         }
         .admin-btn:hover {
-            background: rgba(212, 175, 55, 0.2);
+            background: rgba(212,175,55,0.2);
             border-color: #ffd700;
-            color: white;
         }
-        ::-webkit-scrollbar {
-            width: 5px;
+        .modal {
+            background: rgba(20,18,12,0.95);
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            border: 1px solid #d4af37;
+            max-width: 600px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
         }
-        ::-webkit-scrollbar-track {
-            background: #1a150c;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #d4af37;
-            border-radius: 10px;
-        }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #1a150c; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <canvas id="gold-canvas"></canvas>
+<canvas id="gold-canvas"></canvas>
 
-    <div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
-        <div class="flex justify-between items-center mb-14 flex-wrap gap-4">
-            <div>
-                <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight">
-                    <span class="bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent drop-shadow-lg">RANDYBEATS</span>
-                </h1>
-                <p class="text-amber-200/70 text-sm mt-1">premium instrumentals · wav format</p>
-            </div>
-            <a href="admin.html" class="admin-btn text-sm transition">🔐 Admin Panel</a>
+<div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
+    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <div>
+            <h1 class="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS</h1>
+            <p class="text-amber-200/70 text-sm mt-1">premium instrumentals · wav format</p>
         </div>
-
-        <div id="beatsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
-        <div id="loading" class="text-center text-amber-300/60 py-24 text-lg">Loading beats...</div>
+        <a href="admin.html" class="admin-btn text-sm">🔐 Admin Panel</a>
     </div>
 
-    <script>
-        // ==================== GOLD BAR CANVAS BACKGROUND ====================
-        const canvas = document.getElementById('gold-canvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let goldBars = [];
-        let particles = [];
-        let mouseX = 0, mouseY = 0;
-        let targetX = 0, targetY = 0;
+    <!-- Search & Filter Panel -->
+    <div class="filter-panel">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input type="text" id="searchInput" placeholder="Search by title, genre, tags..." class="w-full">
+            <select id="genreFilter">
+                <option value="">All Genres</option>
+                <option value="Trap">Trap</option>
+                <option value="Drill">Drill</option>
+                <option value="RnB">RnB</option>
+                <option value="Lo-fi">Lo-fi</option>
+                <option value="Pop">Pop</option>
+            </select>
+            <div class="flex gap-2 items-center">
+                <span class="text-sm">BPM:</span>
+                <input type="range" id="bpmMin" min="60" max="180" value="60" class="w-full">
+                <span id="bpmMinVal" class="text-xs">60</span>
+                <span>-</span>
+                <input type="range" id="bpmMax" min="60" max="180" value="180" class="w-full">
+                <span id="bpmMaxVal" class="text-xs">180</span>
+            </div>
+            <button onclick="resetFilters()" class="bg-amber-600/30 border border-amber-500 rounded-full py-2">Reset</button>
+        </div>
+    </div>
 
-        function resizeCanvas() {
-            width = window.innerWidth;
-            height = window.innerHeight;
-            canvas.width = width;
-            canvas.height = height;
+    <div id="beatsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <div id="loading" class="text-center text-amber-300/60 py-24 text-lg">Loading beats...</div>
+</div>
+
+<!-- Beat Detail Modal -->
+<div id="detailModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="modal p-6 relative">
+        <button onclick="closeDetailModal()" class="absolute top-4 right-4 text-2xl text-gray-400 hover:text-white">&times;</button>
+        <div id="detailContent"></div>
+    </div>
+</div>
+
+<!-- Email capture before PayPal -->
+<div id="emailModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="modal p-6 max-w-md">
+        <h2 class="text-2xl font-bold mb-4">Enter your email</h2>
+        <p class="text-sm text-gray-300 mb-4">We'll send the download link to your email after purchase.</p>
+        <input type="email" id="customerEmail" placeholder="your@email.com" class="w-full mb-4">
+        <div class="flex gap-3">
+            <button id="confirmPayBtn" class="flex-1 bg-amber-600 text-black font-bold py-2 rounded-full">Continue to PayPal</button>
+            <button onclick="closeEmailModal()" class="px-4 border border-gray-500 rounded-full">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==================== GOLD CANVAS BACKGROUND ====================
+    const canvas = document.getElementById('gold-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, goldBars = [], particles = [], mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    window.addEventListener('resize', () => { resizeCanvas(); initGoldBars(); initParticles(); });
+    window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; mouseX = mouseX*0.95 + targetX*0.05; mouseY = mouseY*0.95 + targetY*0.05; });
+    class GoldBar { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.w = Math.random()*60+30; this.h = Math.random()*15+8; this.angle = Math.random()*Math.PI*2; this.rotSpeed = (Math.random()-0.5)*0.005; this.moveX = (Math.random()-0.5)*0.3; this.moveY = (Math.random()-0.5)*0.2; this.opacity = Math.random()*0.25+0.1; }
+    update() { let dx = this.x - mouseX, dy = this.y - mouseY, dist = Math.hypot(dx,dy); if (dist<120) { let angle = Math.atan2(dy,dx), force = (120-dist)/120*0.8; this.x += Math.cos(angle)*force; this.y += Math.sin(angle)*force; } this.x += this.moveX; this.y += this.moveY; this.angle += this.rotSpeed; if(this.x<-100) this.x=width+100; if(this.x>width+100) this.x=-100; if(this.y<-100) this.y=height+100; if(this.y>height+100) this.y=-100; }
+    draw() { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle); let grad = ctx.createLinearGradient(-this.w/2,-this.h/2,this.w/2,this.h/2); grad.addColorStop(0,`rgba(212,175,55,${this.opacity*0.8})`); grad.addColorStop(0.5,`rgba(255,215,0,${this.opacity})`); grad.addColorStop(1,`rgba(184,134,11,${this.opacity*0.7})`); ctx.fillStyle=grad; ctx.shadowBlur=12; ctx.shadowColor=`rgba(212,175,55,${this.opacity*0.6})`; ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h); ctx.strokeStyle=`rgba(255,235,140,${this.opacity*0.8})`; ctx.lineWidth=1; ctx.strokeRect(-this.w/2,-this.h/2,this.w,this.h); ctx.restore(); } }
+    class GoldParticle { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.size = Math.random()*2+0.8; this.speedX = (Math.random()-0.5)*0.2; this.speedY = (Math.random()-0.5)*0.15; this.alpha = Math.random()*0.4+0.15; }
+    update() { this.x += this.speedX; this.y += this.speedY; if(this.x<0) this.x=width; if(this.x>width) this.x=0; if(this.y<0) this.y=height; if(this.y>height) this.y=0; }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(255,215,0,${this.alpha})`; ctx.fill(); } }
+    function initGoldBars() { goldBars = []; let barCount = Math.min(35, Math.floor(width/80)); for(let i=0;i<barCount;i++) goldBars.push(new GoldBar()); }
+    function initParticles() { particles = []; let particleCount = Math.min(200, Math.floor(width*height/12000)); for(let i=0;i<particleCount;i++) particles.push(new GoldParticle()); }
+    function drawBackground() { let grad = ctx.createLinearGradient(0,0,width,height); grad.addColorStop(0,'#0a0804'); grad.addColorStop(0.5,'#1c160c'); grad.addColorStop(1,'#0d0a05'); ctx.fillStyle=grad; ctx.fillRect(0,0,width,height); let radGrad = ctx.createRadialGradient(width/2,height/2,50,width/2,height/2,width/1.2); radGrad.addColorStop(0,'rgba(212,175,55,0.05)'); radGrad.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=radGrad; ctx.fillRect(0,0,width,height); }
+    function animate() { if(!ctx) return; drawBackground(); for(let bar of goldBars) { bar.update(); bar.draw(); } for(let p of particles) { p.update(); p.draw(); } requestAnimationFrame(animate); }
+    function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
+    startCanvas();
+
+    // ==================== BEAT STORE LOGIC ====================
+    const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
+    const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
+    let beats = [], filteredBeats = [];
+    let activeAudio = null, activeInterval = null, activeBeatId = null;
+
+    async function loadBeats() {
+        try {
+            const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const data = await res.json();
+            beats = data.record || [];
+            applyFilters();
+        } catch (err) {
+            document.getElementById('loading').innerHTML = 'Failed to load beats.<br>' + err.message;
         }
+    }
 
-        window.addEventListener('resize', () => {
-            resizeCanvas();
-            initGoldBars();
-            initParticles();
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const genreVal = document.getElementById('genreFilter').value;
+        const bpmMin = parseInt(document.getElementById('bpmMin').value);
+        const bpmMax = parseInt(document.getElementById('bpmMax').value);
+        filteredBeats = beats.filter(beat => {
+            if (genreVal && beat.genre !== genreVal) return false;
+            const bpm = parseInt(beat.bpm);
+            if (bpm < bpmMin || bpm > bpmMax) return false;
+            if (searchTerm) {
+                const titleMatch = beat.title.toLowerCase().includes(searchTerm);
+                const genreMatch = beat.genre.toLowerCase().includes(searchTerm);
+                const tagsMatch = beat.tags ? beat.tags.toLowerCase().includes(searchTerm) : false;
+                if (!titleMatch && !genreMatch && !tagsMatch) return false;
+            }
+            return true;
         });
+        renderStore();
+    }
 
-        window.addEventListener('mousemove', (e) => {
-            targetX = e.clientX;
-            targetY = e.clientY;
-            mouseX = mouseX * 0.95 + targetX * 0.05;
-            mouseY = mouseY * 0.95 + targetY * 0.05;
-        });
-
-        // Gold Bar class
-        class GoldBar {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.w = Math.random() * 60 + 30;
-                this.h = Math.random() * 15 + 8;
-                this.angle = Math.random() * Math.PI * 2;
-                this.rotSpeed = (Math.random() - 0.5) * 0.005;
-                this.moveX = (Math.random() - 0.5) * 0.3;
-                this.moveY = (Math.random() - 0.5) * 0.2;
-                this.opacity = Math.random() * 0.25 + 0.1;
-            }
-            update() {
-                // mouse repulsion
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 120) {
-                    const angle = Math.atan2(dy, dx);
-                    const force = (120 - dist) / 120 * 0.8;
-                    this.x += Math.cos(angle) * force;
-                    this.y += Math.sin(angle) * force;
-                }
-                this.x += this.moveX;
-                this.y += this.moveY;
-                this.angle += this.rotSpeed;
-                // wrap
-                if (this.x < -100) this.x = width + 100;
-                if (this.x > width + 100) this.x = -100;
-                if (this.y < -100) this.y = height + 100;
-                if (this.y > height + 100) this.y = -100;
-            }
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-                // gold gradient for bar
-                const grad = ctx.createLinearGradient(-this.w/2, -this.h/2, this.w/2, this.h/2);
-                grad.addColorStop(0, `rgba(212, 175, 55, ${this.opacity * 0.8})`);
-                grad.addColorStop(0.5, `rgba(255, 215, 0, ${this.opacity})`);
-                grad.addColorStop(1, `rgba(184, 134, 11, ${this.opacity * 0.7})`);
-                ctx.fillStyle = grad;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = `rgba(212, 175, 55, ${this.opacity * 0.6})`;
-                ctx.fillRect(-this.w/2, -this.h/2, this.w, this.h);
-                // edge highlight
-                ctx.strokeStyle = `rgba(255, 235, 140, ${this.opacity * 0.8})`;
-                ctx.lineWidth = 1;
-                ctx.strokeRect(-this.w/2, -this.h/2, this.w, this.h);
-                ctx.restore();
-            }
+    function renderStore() {
+        const grid = document.getElementById('beatsGrid');
+        const loadingDiv = document.getElementById('loading');
+        loadingDiv.style.display = 'none';
+        if (!filteredBeats.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">✨ No beats match your filters.</div>';
+            return;
         }
-
-        class GoldParticle {
-            constructor() {
-                this.x = Math.random() * width;
-                this.y = Math.random() * height;
-                this.size = Math.random() * 2 + 0.8;
-                this.speedX = (Math.random() - 0.5) * 0.2;
-                this.speedY = (Math.random() - 0.5) * 0.15;
-                this.alpha = Math.random() * 0.4 + 0.15;
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < 0) this.x = width;
-                if (this.x > width) this.x = 0;
-                if (this.y < 0) this.y = height;
-                if (this.y > height) this.y = 0;
-            }
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 215, 0, ${this.alpha})`;
-                ctx.fill();
-            }
-        }
-
-        function initGoldBars() {
-            goldBars = [];
-            const barCount = Math.min(35, Math.floor(width / 80));
-            for (let i = 0; i < barCount; i++) {
-                goldBars.push(new GoldBar());
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            const particleCount = Math.min(200, Math.floor(width * height / 12000));
-            for (let i = 0; i < particleCount; i++) {
-                particles.push(new GoldParticle());
-            }
-        }
-
-        let gradientShift = 0;
-        function drawBackground() {
-            // deep dark gradient with warm gold undertones
-            const grad = ctx.createLinearGradient(0, 0, width, height);
-            grad.addColorStop(0, '#0a0804');
-            grad.addColorStop(0.5, '#1c160c');
-            grad.addColorStop(1, '#0d0a05');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, width, height);
-            // subtle radial glow
-            const radGrad = ctx.createRadialGradient(width/2, height/2, 50, width/2, height/2, width/1.2);
-            radGrad.addColorStop(0, 'rgba(212,175,55,0.05)');
-            radGrad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = radGrad;
-            ctx.fillRect(0, 0, width, height);
-        }
-
-        function animate() {
-            if (!ctx) return;
-            drawBackground();
-            for (let bar of goldBars) {
-                bar.update();
-                bar.draw();
-            }
-            for (let p of particles) {
-                p.update();
-                p.draw();
-            }
-            requestAnimationFrame(animate);
-        }
-
-        function startCanvas() {
-            resizeCanvas();
-            initGoldBars();
-            initParticles();
-            animate();
-        }
-
-        startCanvas();
-
-        // ==================== BEAT STORE LOGIC (preserved) ====================
-        const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
-        const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
-
-        let activeAudio = null;
-        let activeInterval = null;
-        let activeBeatId = null;
-
-        async function loadBeats() {
-            try {
-                const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                    headers: { 'X-Master-Key': JSONBIN_API_KEY }
-                });
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                const beats = data.record || [];
-                renderStore(beats);
-            } catch (err) {
-                document.getElementById('loading').innerHTML = 'Failed to load beats.<br>' + err.message;
-            }
-        }
-
-        function renderStore(beats) {
-            const grid = document.getElementById('beatsGrid');
-            const loadingDiv = document.getElementById('loading');
-            loadingDiv.style.display = 'none';
-            if (!beats.length) {
-                grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">✨ No beats yet — add some in the admin panel.</div>';
-                return;
-            }
-            grid.innerHTML = beats.map(beat => `
-                <div class="beat-card">
-                    ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img" onerror="this.src='https://placehold.co/600x400/2a2418/white?text=🎵'">` : `<div class="placeholder-cover">🎧</div>`}
-                    <div class="p-5">
-                        <div class="flex justify-between items-start gap-3">
-                            <div>
-                                <h3 class="text-xl font-bold tracking-tight text-amber-100">${escapeHtml(beat.title)}</h3>
-                                <div class="flex items-center gap-2 mt-2">
-                                    <span class="genre-badge">${escapeHtml(beat.genre)}</span>
-                                    <span class="text-sm text-amber-400 font-medium">${beat.bpm} BPM</span>
-                                </div>
+        grid.innerHTML = filteredBeats.map(beat => `
+            <div class="beat-card">
+                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img" onerror="this.src='https://placehold.co/600x400/2a2418/white?text=🎵'">` : `<div class="placeholder-cover">🎧</div>`}
+                <div class="p-5">
+                    <div class="flex justify-between items-start gap-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-100">${escapeHtml(beat.title)}</h3>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="genre-badge">${escapeHtml(beat.genre)}</span>
+                                <span class="text-sm text-amber-400">${beat.bpm} BPM</span>
+                                ${beat.tags ? beat.tags.split(',').slice(0,2).map(t => `<span class="tag-badge">${escapeHtml(t.trim())}</span>`).join('') : ''}
                             </div>
-                            <span class="price">$${beat.price}</span>
                         </div>
-                        <div class="mt-5">
-                            <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">
-                                <span class="play-icon">▶</span> 30s Preview
-                            </button>
-                            <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
-                            <div id="time-${beat.id}" class="time-text">0:00 / 0:30</div>
-                            <div id="error-${beat.id}" class="error-msg hidden"></div>
-                        </div>
-                        <div id="paypal-${beat.id}" class="mt-5"></div>
+                        <span class="price">$${beat.price}</span>
+                    </div>
+                    <div class="mt-4">
+                        <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">▶ 30s Preview</button>
+                        <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
+                        <div id="time-${beat.id}" class="time-text">0:00 / 0:30</div>
+                        <div id="error-${beat.id}" class="error-msg hidden"></div>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="showDetail('${beat.id}')" class="flex-1 bg-amber-600/20 border border-amber-500 rounded-full py-2 text-sm">Details</button>
+                        <button class="buy-now-btn flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold rounded-full py-2 text-sm" data-id="${beat.id}" data-price="${beat.price}" data-title="${beat.title}">Buy Now</button>
                     </div>
                 </div>
-            `).join('');
+            </div>
+        `).join('');
 
-            document.querySelectorAll('.preview-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const id = btn.getAttribute('data-id');
-                    const url = btn.getAttribute('data-url');
-                    togglePreview(id, url);
-                });
-            });
+        attachPreviewEvents();
+        attachBuyEvents();
+    }
 
-            beats.forEach(beat => {
-                if (window.paypal) {
-                    paypal.Buttons({
-                        createOrder: (data, actions) => actions.order.create({
-                            purchase_units: [{ amount: { value: beat.price, currency: "USD" }, description: beat.title }]
-                        }),
-                        onApprove: () => alert("✅ Purchase complete! You'll receive the full WAV download link via email.")
-                    }).render(`#paypal-${beat.id}`);
-                }
-            });
+    function attachPreviewEvents() {
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.removeEventListener('click', previewHandler);
+            btn.addEventListener('click', previewHandler);
+        });
+    }
+    function previewHandler(e) {
+        const btn = e.currentTarget;
+        const id = btn.getAttribute('data-id');
+        const url = btn.getAttribute('data-url');
+        togglePreview(id, url);
+    }
+    function attachBuyEvents() {
+        document.querySelectorAll('.buy-now-btn').forEach(btn => {
+            btn.removeEventListener('click', buyHandler);
+            btn.addEventListener('click', buyHandler);
+        });
+    }
+    let pendingPurchase = null;
+    function buyHandler(e) {
+        const btn = e.currentTarget;
+        pendingPurchase = {
+            id: btn.getAttribute('data-id'),
+            price: btn.getAttribute('data-price'),
+            title: btn.getAttribute('data-title')
+        };
+        openEmailModal();
+    }
+
+    // Preview logic (same as before, working)
+    function togglePreview(beatId, audioUrl) {
+        if (activeBeatId === beatId && activeAudio && !activeAudio.paused) { stopPreview(); return; }
+        stopPreview();
+        const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
+        const progressFill = document.getElementById(`progress-${beatId}`);
+        const timeDisplay = document.getElementById(`time-${beatId}`);
+        const errorDiv = document.getElementById(`error-${beatId}`);
+        btn.innerHTML = '⏳ Loading...'; btn.disabled = true; errorDiv.classList.add('hidden');
+        const audio = new Audio(); audio.src = audioUrl; audio.crossOrigin = "Anonymous";
+        let maxDuration = 30, interval = null;
+        audio.addEventListener('loadedmetadata', () => {
+            maxDuration = Math.min(audio.duration,30); audio.currentTime = 0;
+            audio.play().then(() => {
+                btn.innerHTML = '⏸ Pause'; btn.disabled = false; btn.classList.add('playing');
+                activeAudio = audio; activeBeatId = beatId;
+                interval = setInterval(() => {
+                    if (audio.paused) { clearInterval(interval); resetPreviewBtn(btn, progressFill, timeDisplay); return; }
+                    if (audio.currentTime >= maxDuration) { audio.pause(); audio.currentTime = 0; clearInterval(interval); resetPreviewBtn(btn, progressFill, timeDisplay); }
+                    else { const percent = (audio.currentTime / maxDuration)*100; progressFill.style.width = percent+'%'; const curSec = Math.floor(audio.currentTime); timeDisplay.textContent = `${Math.floor(curSec/60)}:${(curSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`; }
+                }, 200);
+            }).catch(() => { btn.innerHTML = '▶ 30s Preview'; btn.disabled = false; errorDiv.textContent = '❌ Cannot play audio.'; errorDiv.classList.remove('hidden'); });
+        });
+        audio.onerror = () => { btn.innerHTML = '▶ 30s Preview'; btn.disabled = false; errorDiv.textContent = '❌ Failed to load audio.'; errorDiv.classList.remove('hidden'); };
+        function resetPreviewBtn(btn, prog, time) { btn.innerHTML = '▶ 30s Preview'; btn.classList.remove('playing'); prog.style.width = '0%'; time.textContent = '0:00 / 0:30'; activeAudio = null; activeBeatId = null; }
+    }
+    function stopPreview() { if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; if(activeInterval) clearInterval(activeInterval); const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`); if(oldBtn){ oldBtn.innerHTML='▶ 30s Preview'; oldBtn.classList.remove('playing'); } const oldProg = document.getElementById(`progress-${activeBeatId}`); if(oldProg) oldProg.style.width='0%'; const oldTime = document.getElementById(`time-${activeBeatId}`); if(oldTime) oldTime.textContent='0:00 / 0:30'; activeAudio=null; activeBeatId=null; } }
+
+    // Detail Modal
+    function showDetail(beatId) {
+        const beat = beats.find(b => b.id === beatId);
+        if (!beat) return;
+        const modal = document.getElementById('detailModal');
+        const content = document.getElementById('detailContent');
+        content.innerHTML = `
+            <div class="text-center">
+                ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-full max-h-64 object-cover rounded-2xl mb-4">` : `<div class="w-full h-48 bg-gray-800 rounded-2xl flex items-center justify-center text-4xl mb-4">🎧</div>`}
+                <h2 class="text-3xl font-bold">${escapeHtml(beat.title)}</h2>
+                <div class="flex justify-center gap-3 mt-2">
+                    <span class="genre-badge">${escapeHtml(beat.genre)}</span>
+                    <span class="text-amber-400">${beat.bpm} BPM</span>
+                </div>
+                <p class="text-2xl font-bold text-yellow-400 mt-2">$${beat.price}</p>
+                ${beat.tags ? `<div class="mt-3"><strong>Tags:</strong> ${escapeHtml(beat.tags)}</div>` : ''}
+                <div class="mt-5">
+                    <audio controls src="${beat.audioUrl}" class="w-full"></audio>
+                </div>
+                <button onclick="buyNowFromDetail('${beat.id}', '${beat.price}', '${beat.title}')" class="mt-5 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-8 py-3 rounded-full w-full">Buy Now - $${beat.price}</button>
+            </div>
+        `;
+        modal.classList.remove('hidden'); modal.classList.add('flex');
+    }
+    function closeDetailModal() { document.getElementById('detailModal').classList.add('hidden'); }
+    function buyNowFromDetail(id, price, title) { pendingPurchase = { id, price, title }; openEmailModal(); }
+
+    // Email capture before PayPal
+    let emailModalOpen = false;
+    function openEmailModal() { document.getElementById('emailModal').classList.remove('hidden'); document.getElementById('emailModal').classList.add('flex'); emailModalOpen = true; }
+    function closeEmailModal() { document.getElementById('emailModal').classList.add('hidden'); pendingPurchase = null; }
+    document.getElementById('confirmPayBtn').addEventListener('click', () => {
+        const email = document.getElementById('customerEmail').value;
+        if (!email || !email.includes('@')) { alert('Please enter a valid email.'); return; }
+        localStorage.setItem('lastPurchaseEmail', email);
+        closeEmailModal();
+        if (pendingPurchase) {
+            // Simulate PayPal flow – open PayPal with the beat amount
+            const price = pendingPurchase.price;
+            const title = pendingPurchase.title;
+            // Create a temporary PayPal button container
+            const tempDiv = document.createElement('div');
+            tempDiv.style.position = 'fixed'; tempDiv.style.top = '-1000px';
+            document.body.appendChild(tempDiv);
+            paypal.Buttons({
+                createOrder: (data, actions) => actions.order.create({
+                    purchase_units: [{ amount: { value: price, currency: "USD" }, description: title }]
+                }),
+                onApprove: (data, actions) => actions.order.capture().then(details => {
+                    alert(`✅ Purchase complete! Download link will be sent to ${email}. Thank you!`);
+                    tempDiv.remove();
+                }),
+                onError: (err) => { alert('PayPal error: ' + err); tempDiv.remove(); }
+            }).render(tempDiv);
+            tempDiv.querySelector('div')?.click(); // auto-click to open PayPal
         }
+    });
 
-        function togglePreview(beatId, audioUrl) {
-            if (activeBeatId === beatId && activeAudio && !activeAudio.paused) {
-                stopPreview();
-                return;
-            }
-            stopPreview();
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('genreFilter').value = '';
+        document.getElementById('bpmMin').value = '60';
+        document.getElementById('bpmMax').value = '180';
+        document.getElementById('bpmMinVal').innerText = '60';
+        document.getElementById('bpmMaxVal').innerText = '180';
+        applyFilters();
+    }
+    document.getElementById('bpmMin').addEventListener('input', (e) => { document.getElementById('bpmMinVal').innerText = e.target.value; applyFilters(); });
+    document.getElementById('bpmMax').addEventListener('input', (e) => { document.getElementById('bpmMaxVal').innerText = e.target.value; applyFilters(); });
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('genreFilter').addEventListener('change', applyFilters);
 
-            const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
-            const progressFill = document.getElementById(`progress-${beatId}`);
-            const timeDisplay = document.getElementById(`time-${beatId}`);
-            const errorDiv = document.getElementById(`error-${beatId}`);
-
-            btn.innerHTML = '<span>⏳</span> Loading...';
-            btn.disabled = true;
-            errorDiv.classList.add('hidden');
-
-            const audio = new Audio();
-            audio.src = audioUrl;
-            audio.crossOrigin = "Anonymous";
-
-            let maxDuration = 30;
-            let interval = null;
-
-            audio.addEventListener('loadedmetadata', () => {
-                maxDuration = Math.min(audio.duration, 30);
-                audio.currentTime = 0;
-                audio.play().then(() => {
-                    btn.innerHTML = '<span>⏸</span> Pause';
-                    btn.disabled = false;
-                    btn.classList.add('playing');
-                    activeAudio = audio;
-                    activeBeatId = beatId;
-
-                    interval = setInterval(() => {
-                        if (audio.paused) {
-                            clearInterval(interval);
-                            btn.innerHTML = '<span>▶</span> 30s Preview';
-                            btn.classList.remove('playing');
-                            progressFill.style.width = '0%';
-                            timeDisplay.textContent = '0:00 / 0:30';
-                            activeAudio = null;
-                            activeBeatId = null;
-                            return;
-                        }
-                        if (audio.currentTime >= maxDuration) {
-                            audio.pause();
-                            audio.currentTime = 0;
-                            clearInterval(interval);
-                            btn.innerHTML = '<span>▶</span> 30s Preview';
-                            btn.classList.remove('playing');
-                            progressFill.style.width = '0%';
-                            timeDisplay.textContent = '0:00 / 0:30';
-                            activeAudio = null;
-                            activeBeatId = null;
-                        } else {
-                            const percent = (audio.currentTime / maxDuration) * 100;
-                            progressFill.style.width = percent + '%';
-                            const currentSec = Math.floor(audio.currentTime);
-                            timeDisplay.textContent = `${Math.floor(currentSec/60)}:${(currentSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`;
-                        }
-                    }, 200);
-                }).catch(err => {
-                    btn.innerHTML = '<span>▶</span> 30s Preview';
-                    btn.disabled = false;
-                    errorDiv.textContent = '❌ Cannot play audio. Check URL or CORS.';
-                    errorDiv.classList.remove('hidden');
-                });
-            });
-
-            audio.onerror = () => {
-                btn.innerHTML = '<span>▶</span> 30s Preview';
-                btn.disabled = false;
-                errorDiv.textContent = '❌ Failed to load audio. Invalid URL or CORS.';
-                errorDiv.classList.remove('hidden');
-            };
-        }
-
-        function stopPreview() {
-            if (activeAudio) {
-                activeAudio.pause();
-                activeAudio.currentTime = 0;
-                if (activeInterval) clearInterval(activeInterval);
-                const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`);
-                if (oldBtn) {
-                    oldBtn.innerHTML = '<span>▶</span> 30s Preview';
-                    oldBtn.classList.remove('playing');
-                }
-                const oldProgress = document.getElementById(`progress-${activeBeatId}`);
-                if (oldProgress) oldProgress.style.width = '0%';
-                const oldTime = document.getElementById(`time-${activeBeatId}`);
-                if (oldTime) oldTime.textContent = '0:00 / 0:30';
-                activeAudio = null;
-                activeBeatId = null;
-            }
-        }
-
-        function escapeHtml(str) {
-            if (!str) return '';
-            return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
-        }
-
-        loadBeats();
-    </script>
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    loadBeats();
+</script>
 </body>
 </html>
