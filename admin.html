@@ -30,58 +30,40 @@
             border-radius: 28px;
             border: 1px solid rgba(212, 175, 55, 0.4);
             box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
         }
-        .glass-card:hover { border-color: #d4af37; }
-        input, textarea, select {
+        input, button {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 16px;
-            padding: 10px 14px;
+            border-radius: 40px;
+            padding: 10px 16px;
             color: #f5f0e0;
             width: 100%;
         }
-        input:focus, textarea:focus { outline: none; border-color: #ffd700; }
         button {
             background: rgba(212, 175, 55, 0.2);
-            border: 1px solid #d4af37;
-            border-radius: 40px;
-            padding: 10px 20px;
-            font-weight: 600;
             cursor: pointer;
-            color: #f5e6b0;
+            font-weight: 600;
         }
         button:hover { background: rgba(212, 175, 55, 0.4); border-color: #ffd700; color: white; }
-        .delete-btn { background: rgba(180, 50, 50, 0.3); border-color: #b8860b; }
-        .delete-btn:hover { background: rgba(200, 60, 60, 0.6); }
-        .upload-zone {
-            border: 2px dashed rgba(212, 175, 55, 0.5);
-            border-radius: 20px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-        }
-        .upload-zone:hover { border-color: #ffd700; background: rgba(212, 175, 55, 0.05); }
-        .cover-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 16px; border: 1px solid #d4af37; }
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: #1a150c; }
-        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
 <body>
 <canvas id="gold-canvas"></canvas>
 <div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
-    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
-        <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
-        <button onclick="logout()" class="admin-logout-btn">🚪 Logout</button>
+    <div id="authContainer" class="flex items-center justify-center min-h-[80vh]"></div>
+    <div id="adminContent" style="display:none;">
+        <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+            <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
+            <button onclick="logout()" class="admin-logout-btn">🚪 Logout</button>
+        </div>
+        <div class="mb-8">
+            <button onclick="openAddModal()" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
+        </div>
+        <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
     </div>
-    <div class="mb-8">
-        <button onclick="openAddModal()" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
-    </div>
-    <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 </div>
 
-<!-- Modal -->
+<!-- Modal (same as before) -->
 <div id="beatModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
     <div class="glass-card max-w-lg w-full p-6">
         <div class="flex justify-between items-center mb-4">
@@ -95,12 +77,12 @@
                 <div><label class="block text-sm mb-1">Genre</label><input type="text" id="genre" placeholder="Trap, Drill..."></div>
                 <div><label class="block text-sm mb-1">BPM</label><input type="number" id="bpm" placeholder="140"></div>
             </div>
-            <div class="mb-3"><label class="block text-sm mb-1">Tags (comma separated, e.g. dark, melodic)</label><input type="text" id="tags" placeholder="dark, piano, aggressive"></div>
+            <div class="mb-3"><label class="block text-sm mb-1">Tags (comma separated)</label><input type="text" id="tags" placeholder="dark, melodic"></div>
             <div class="mb-3"><label class="block text-sm mb-1">Price (USD) *</label><input type="number" step="0.01" id="price" required></div>
-            <div class="mb-3"><label class="block text-sm mb-1">Audio URL (preview / full WAV) *</label><input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required><p class="text-xs text-amber-400/60 mt-1">Upload to catbox.moe and paste link.</p></div>
+            <div class="mb-3"><label class="block text-sm mb-1">Audio URL *</label><input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required></div>
             <div class="mb-4">
                 <label class="block text-sm mb-1">Cover Art (optional)</label>
-                <div id="coverUploadZone" class="upload-zone"><input type="file" id="coverFile" accept="image/*" class="hidden"><div id="coverPreview" class="text-center"><div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload</p></div></div>
+                <div id="coverUploadZone" class="upload-zone" style="border:2px dashed rgba(212,175,55,0.5); border-radius:20px; padding:20px; text-align:center; cursor:pointer;"><input type="file" id="coverFile" accept="image/*" class="hidden"><div id="coverPreview" class="text-center"><div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload</p></div></div>
                 <input type="hidden" id="coverUrl"><div id="uploadStatus" class="text-xs mt-1"></div>
             </div>
             <div class="flex gap-3">
@@ -112,7 +94,16 @@
 </div>
 
 <script>
-    // ==================== GOLD CANVAS (same as index) ====================
+    // ==================== SIMPLE SHA-256 HASH FUNCTION ====================
+    async function hashPassword(password) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ==================== GOLD CANVAS BACKGROUND ====================
     const canvas = document.getElementById('gold-canvas');
     const ctx = canvas.getContext('2d');
     let width, height, goldBars = [], particles = [], mouseX=0, mouseY=0, targetX=0, targetY=0;
@@ -132,21 +123,67 @@
     function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
     startCanvas();
 
-    // ==================== ADMIN LOGIC ====================
+    // ==================== ADMIN LOGIC (localStorage password, no visible reset hint) ====================
     const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
     const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
-    const ADMIN_PASSWORD = "randybeats2025";
     const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";
     let beats = [];
+    let isAuthenticated = false;
 
-    function checkAuth() {
-        if (sessionStorage.getItem('adminAuth') !== 'true') {
-            const pwd = prompt("Enter admin password:");
-            if (pwd === ADMIN_PASSWORD) { sessionStorage.setItem('adminAuth','true'); loadBeats(); }
-            else { document.body.innerHTML = '<div class="flex items-center justify-center h-screen"><div class="glass-card p-8 text-center"><h1 class="text-2xl mb-4">Access Denied</h1><button onclick="location.reload()" class="bg-amber-600 px-4 py-2 rounded">Try Again</button></div></div>'; }
-        } else { loadBeats(); }
+    async function initAuth() {
+        const storedHash = localStorage.getItem('adminPasswordHash');
+        const container = document.getElementById('authContainer');
+        const adminContent = document.getElementById('adminContent');
+
+        if (!storedHash) {
+            // First time: create password
+            container.innerHTML = `
+                <div class="glass-card p-8 max-w-md w-full text-center">
+                    <h2 class="text-2xl font-bold mb-4">🔐 First Time Setup</h2>
+                    <p class="text-sm text-gray-300 mb-4">Create an admin password. This will be stored only in your browser.</p>
+                    <input type="password" id="newPassword" placeholder="Enter password" class="mb-3">
+                    <input type="password" id="confirmPassword" placeholder="Confirm password" class="mb-4">
+                    <button id="setupBtn" class="w-full bg-amber-600 text-black font-bold py-2 rounded-full">Create Admin Password</button>
+                </div>
+            `;
+            document.getElementById('setupBtn').addEventListener('click', async () => {
+                const pwd = document.getElementById('newPassword').value;
+                const confirm = document.getElementById('confirmPassword').value;
+                if (!pwd) { alert("Please enter a password."); return; }
+                if (pwd !== confirm) { alert("Passwords do not match."); return; }
+                const hash = await hashPassword(pwd);
+                localStorage.setItem('adminPasswordHash', hash);
+                alert("Password created! You are now logged in.");
+                container.style.display = 'none';
+                adminContent.style.display = 'block';
+                isAuthenticated = true;
+                loadBeats();
+            });
+        } else {
+            // Existing hash: ask for password (no note, no reset button)
+            container.innerHTML = `
+                <div class="glass-card p-8 max-w-md w-full text-center">
+                    <h2 class="text-2xl font-bold mb-4">🔐 Admin Login</h2>
+                    <input type="password" id="loginPassword" placeholder="Enter your password" class="mb-4">
+                    <button id="loginBtn" class="w-full bg-amber-600 text-black font-bold py-2 rounded-full">Login</button>
+                </div>
+            `;
+            document.getElementById('loginBtn').addEventListener('click', async () => {
+                const pwd = document.getElementById('loginPassword').value;
+                const hash = await hashPassword(pwd);
+                if (hash === storedHash) {
+                    container.style.display = 'none';
+                    adminContent.style.display = 'block';
+                    isAuthenticated = true;
+                    loadBeats();
+                } else {
+                    alert("Wrong password.");
+                }
+            });
+        }
     }
-    async function loadBeats() { const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } }); const data = await res.json(); beats = data.record || []; renderBeats(); }
+
+    async function loadBeats() { if(!isAuthenticated) return; const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } }); const data = await res.json(); beats = data.record || []; renderBeats(); }
     async function saveBeats() { await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY }, body: JSON.stringify(beats) }); }
     function renderBeats() {
         const grid = document.getElementById('beatsGrid');
@@ -161,18 +198,19 @@
             </div>
         `).join('');
     }
-    window.editBeat = (id) => { const beat = beats.find(b=>b.id===id); if(!beat) return; document.getElementById('modalTitle').innerText='Edit Beat'; document.getElementById('beatId').value=beat.id; document.getElementById('title').value=beat.title; document.getElementById('genre').value=beat.genre||''; document.getElementById('bpm').value=beat.bpm; document.getElementById('price').value=beat.price; document.getElementById('audioUrl').value=beat.audioUrl; document.getElementById('tags').value=beat.tags||''; document.getElementById('coverUrl').value=beat.coverArt||''; if(beat.coverArt) document.getElementById('coverPreview').innerHTML=`<img src="${beat.coverArt}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-amber-300">Current cover</p>`; else document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; openModal(); };
+    window.editBeat = (id) => { const beat = beats.find(b=>b.id===id); if(!beat) return; document.getElementById('modalTitle').innerText='Edit Beat'; document.getElementById('beatId').value=beat.id; document.getElementById('title').value=beat.title; document.getElementById('genre').value=beat.genre||''; document.getElementById('bpm').value=beat.bpm; document.getElementById('price').value=beat.price; document.getElementById('audioUrl').value=beat.audioUrl; document.getElementById('tags').value=beat.tags||''; document.getElementById('coverUrl').value=beat.coverArt||''; if(beat.coverArt) document.getElementById('coverPreview').innerHTML=`<img src="${beat.coverArt}" class="w-20 h-20 object-cover rounded-lg mx-auto"><p class="text-xs mt-1 text-amber-300">Current cover</p>`; else document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; openModal(); };
     window.deleteBeat = async (id) => { if(confirm('Delete this beat?')) { beats = beats.filter(b=>b.id!==id); await saveBeats(); renderBeats(); } };
     async function uploadCover(file) { const fd = new FormData(); fd.append('image',file); fd.append('key',IMGBB_API_KEY); const res = await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}); const data = await res.json(); if(!data.success) throw new Error(data.error?.message); return data.data.url; }
     document.getElementById('coverUploadZone').addEventListener('click',()=>document.getElementById('coverFile').click());
-    document.getElementById('coverFile').addEventListener('change',async(e)=>{ const file=e.target.files[0]; if(!file) return; const status=document.getElementById('uploadStatus'); status.innerText='Uploading...'; try{ const url=await uploadCover(file); document.getElementById('coverUrl').value=url; document.getElementById('coverPreview').innerHTML=`<img src="${url}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-green-400">✓ Uploaded</p>`; status.innerText=''; } catch(err){ status.innerText='Upload failed'; } });
+    document.getElementById('coverFile').addEventListener('change',async(e)=>{ const file=e.target.files[0]; if(!file) return; const status=document.getElementById('uploadStatus'); status.innerText='Uploading...'; try{ const url=await uploadCover(file); document.getElementById('coverUrl').value=url; document.getElementById('coverPreview').innerHTML=`<img src="${url}" class="w-20 h-20 object-cover rounded-lg mx-auto"><p class="text-xs mt-1 text-green-400">✓ Uploaded</p>`; status.innerText=''; } catch(err){ status.innerText='Upload failed'; } });
     document.getElementById('beatForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const id = document.getElementById('beatId').value || Date.now().toString(); const title = document.getElementById('title').value.trim(); if(!title) return alert('Title required'); const audioUrl = document.getElementById('audioUrl').value.trim(); if(!audioUrl) return alert('Audio URL required'); const newBeat = { id, title, genre: document.getElementById('genre').value.trim()||'Instrumental', bpm: document.getElementById('bpm').value||'140', price: parseFloat(document.getElementById('price').value).toFixed(2), audioUrl, coverArt: document.getElementById('coverUrl').value||'', tags: document.getElementById('tags').value.trim()||'' }; const idx = beats.findIndex(b=>b.id===id); if(idx!==-1) beats[idx]=newBeat; else beats.push(newBeat); await saveBeats(); renderBeats(); closeModal(); alert('Beat saved!'); });
     function openAddModal() { document.getElementById('modalTitle').innerText='Add New Beat'; document.getElementById('beatForm').reset(); document.getElementById('beatId').value=''; document.getElementById('coverUrl').value=''; document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; document.getElementById('uploadStatus').innerText=''; openModal(); }
     function openModal() { document.getElementById('beatModal').classList.remove('hidden'); document.getElementById('beatModal').classList.add('flex'); }
     function closeModal() { document.getElementById('beatModal').classList.add('hidden'); }
-    function logout() { sessionStorage.removeItem('adminAuth'); location.reload(); }
+    function logout() { localStorage.removeItem('adminPasswordHash'); location.reload(); }
     function escapeHtml(str) { return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
-    checkAuth();
+
+    initAuth();
 </script>
 </body>
 </html>
