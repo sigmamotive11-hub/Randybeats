@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RANDYBEATS | Catalog</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0804;
+            color: #f5f0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #gold-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+        }
+        .beat-card {
+            background: rgba(20, 18, 12, 0.7);
+            backdrop-filter: blur(14px);
+            border-radius: 28px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            transition: all 0.4s;
+            overflow: hidden;
+            box-shadow: 0 20px 35px -15px rgba(0,0,0,0.6);
+        }
+        .beat-card:hover {
+            transform: translateY(-8px);
+            border-color: #d4af37;
+            box-shadow: 0 25px 40px -15px rgba(212,175,55,0.4);
+        }
+        .cover-img { width: 100%; height: 210px; object-fit: cover; transition: transform 0.5s; }
+        .beat-card:hover .cover-img { transform: scale(1.03); }
+        .placeholder-cover {
+            width: 100%; height: 210px;
+            background: linear-gradient(135deg, #2a2418, #1a150c);
+            display: flex; align-items: center; justify-content: center; font-size: 3rem;
+        }
+        .preview-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.6);
+            border-radius: 60px;
+            padding: 10px 0;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            color: #f5e6b0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .preview-btn:hover { background: rgba(212,175,55,0.2); border-color: #ffd700; color: white; }
+        .preview-btn.playing { background: rgba(212,175,55,0.3); animation: pulseGold 1s infinite; }
+        @keyframes pulseGold {
+            0% { box-shadow: 0 0 0 0 rgba(212,175,55,0.5); }
+            70% { box-shadow: 0 0 0 8px rgba(212,175,55,0); }
+            100% { box-shadow: 0 0 0 0 rgba(212,175,55,0); }
+        }
+        .progress-bar { width: 100%; height: 4px; background: #2a2418; border-radius: 4px; margin: 12px 0 6px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #d4af37, #ffd700); width: 0%; transition: width 0.1s linear; }
+        .time-text { font-size: 11px; font-family: monospace; color: #d4af37; text-align: right; }
+        .price { background: linear-gradient(135deg, #ffd700, #b8860b); background-clip: text; -webkit-background-clip: text; color: transparent; font-weight: 800; font-size: 1.8rem; }
+        .genre-badge, .tag-badge { background: rgba(212,175,55,0.2); border-radius: 30px; padding: 3px 12px; font-size: 0.7rem; font-weight: 600; color: #ffd700; display: inline-block; }
+        .filter-panel { background: rgba(20,18,12,0.6); backdrop-filter: blur(12px); border-radius: 28px; border: 1px solid rgba(212,175,55,0.3); padding: 1rem; margin-bottom: 2rem; }
+        input, select { background: rgba(0,0,0,0.5); border: 1px solid rgba(212,175,55,0.4); border-radius: 40px; padding: 8px 16px; color: #f5f0e0; width: 100%; }
+        input:focus, select:focus { outline: none; border-color: #ffd700; }
+        .modal {
+            background: rgba(20,18,12,0.95);
+            backdrop-filter: blur(16px);
+            border-radius: 32px;
+            border: 1px solid #d4af37;
+            max-width: 500px;
+            width: 90%;
+            padding: 2rem;
+            color: white;
+        }
+        .btn-gold { background: linear-gradient(135deg, #d4af37, #ffd700); color: black; font-weight: bold; border: none; }
+        .btn-gold:hover { opacity: 0.9; transform: scale(0.98); }
+        .auth-tab { display: inline-block; padding: 8px 20px; cursor: pointer; border-radius: 40px; margin-right: 8px; background: rgba(255,255,255,0.1); }
+        .auth-tab.active { background: #d4af37; color: black; }
+    </style>
+</head>
+<body>
+
+<canvas id="gold-canvas"></canvas>
+
+<div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
+    <!-- Header with auth buttons -->
+    <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+        <div>
+            <h1 class="text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS</h1>
+            <p class="text-amber-200/70 text-sm mt-1">premium instrumentals · wav format</p>
+        </div>
+        <div id="authButtons">
+            <button id="loginBtn" class="bg-amber-600/30 border border-amber-500 rounded-full px-5 py-2 text-sm">🔐 Sign In / Register</button>
+            <div id="userInfo" style="display:none;" class="flex items-center gap-3">
+                <span id="userName" class="text-sm text-amber-300"></span>
+                <button id="logoutBtn" class="border border-gray-500 rounded-full px-4 py-1 text-xs">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Panel -->
+    <div class="filter-panel">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <input type="text" id="searchInput" placeholder="Search by title, genre, tags...">
+            <select id="genreFilter"><option value="">All Genres</option><option>Trap</option><option>Drill</option><option>RnB</option><option>Lo-fi</option><option>Pop</option></select>
+            <div class="flex gap-2 items-center"><span class="text-sm">BPM:</span><input type="range" id="bpmMin" min="60" max="180" value="60"><span id="bpmMinVal">60</span><span>-</span><input type="range" id="bpmMax" min="60" max="180" value="180"><span id="bpmMaxVal">180</span></div>
+            <button onclick="resetFilters()" class="bg-amber-600/30 border border-amber-500 rounded-full py-2">Reset</button>
+        </div>
+    </div>
+
+    <!-- Beats Grid -->
+    <div id="beatsGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8"></div>
+    <div id="loading" class="text-center text-amber-300/60 py-24 text-lg">Loading beats...</div>
+</div>
+
+<!-- Auth Modal (Sign In / Sign Up) -->
+<div id="authModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
+    <div class="modal">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold">Account Access</h2>
+            <button onclick="closeAuthModal()" class="text-gray-400 text-2xl">&times;</button>
+        </div>
+        <div class="flex gap-2 mb-4 border-b border-gray-700 pb-2">
+            <button class="auth-tab active" data-tab="login">Sign In</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+        </div>
+        <!-- Sign In Tab -->
+        <div id="loginTab">
+            <input type="email" id="loginEmail" placeholder="Email" class="w-full mb-3">
+            <input type="password" id="loginPassword" placeholder="Password" class="w-full mb-3">
+            <button id="emailLoginBtn" class="w-full btn-gold py-2 rounded-full mb-3">Sign In with Email</button>
+            <button id="googleLoginBtn" class="w-full bg-white/10 border border-white/20 py-2 rounded-full mb-2">Sign In with Google</button>
+            <div class="relative my-4"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div><div class="relative flex justify-center text-xs"><span class="bg-black/50 px-2">OR</span></div></div>
+            <div class="flex gap-2">
+                <input type="tel" id="phoneNumber" placeholder="+1234567890" class="flex-1">
+                <button id="sendOtpBtn" class="bg-amber-600 px-4 rounded-full">Send OTP</button>
+            </div>
+            <div id="otpSection" style="display:none;" class="mt-3">
+                <input type="text" id="otpCode" placeholder="6-digit code" class="w-full mb-2">
+                <button id="verifyOtpBtn" class="w-full bg-amber-600 py-2 rounded-full">Verify & Sign In</button>
+            </div>
+        </div>
+        <!-- Sign Up Tab -->
+        <div id="signupTab" style="display:none;">
+            <input type="email" id="signupEmail" placeholder="Email" class="w-full mb-3">
+            <input type="password" id="signupPassword" placeholder="Password" class="w-full mb-3">
+            <button id="emailSignupBtn" class="w-full btn-gold py-2 rounded-full">Create Account</button>
+            <div class="text-center text-xs text-gray-400 mt-3">By signing up, you agree to our terms.</div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    // Firebase imports (must match your firebase-init.js)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    // Your Firebase config (paste yours here)
+    const firebaseConfig = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_AUTH_DOMAIN",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_BUCKET",
+        messagingSenderId: "YOUR_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    // DOM elements
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userInfo = document.getElementById('userInfo');
+    const userNameSpan = document.getElementById('userName');
+    const authModal = document.getElementById('authModal');
+    let currentUser = null;
+    let recaptchaVerifier = null;
+    let confirmationResult = null;
+
+    // UI Helpers
+    function showAuthModal() { authModal.classList.remove('hidden'); authModal.classList.add('flex'); }
+    function closeAuthModal() { authModal.classList.add('hidden'); }
+    function updateUI(user) {
+        if (user) {
+            currentUser = user;
+            loginBtn.style.display = 'none';
+            userInfo.style.display = 'flex';
+            userNameSpan.textContent = user.displayName || user.email || user.phoneNumber;
+        } else {
+            currentUser = null;
+            loginBtn.style.display = 'block';
+            userInfo.style.display = 'none';
+        }
+    }
+
+    // Auth state listener
+    auth.onAuthStateChanged(user => {
+        updateUI(user);
+        if (user) {
+            console.log("Logged in:", user);
+        }
+        loadBeats(); // reload beats (optional: show buy buttons only if user exists)
+    });
+
+    // Tab switching
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            document.getElementById('loginTab').style.display = target === 'login' ? 'block' : 'none';
+            document.getElementById('signupTab').style.display = target === 'signup' ? 'block' : 'none';
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+
+    // Email Sign Up
+    document.getElementById('emailSignupBtn').addEventListener('click', async () => {
+        const email = document.getElementById('signupEmail').value;
+        const password = document.getElementById('signupPassword').value;
+        try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            closeAuthModal();
+        } catch (err) { alert(err.message); }
+    });
+
+    // Email Sign In
+    document.getElementById('emailLoginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const password = document.getElementById('loginPassword').value;
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            closeAuthModal();
+        } catch (err) { alert(err.message); }
+    });
+
+    // Google Sign In
+    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        try {
+            await signInWithPopup(auth, googleProvider);
+            closeAuthModal();
+        } catch (err) { alert(err.message); }
+    });
+
+    // Phone Number Auth (reCAPTCHA + OTP)
+    function setupRecaptcha() {
+        if (!recaptchaVerifier) {
+            recaptchaVerifier = new RecaptchaVerifier(auth, 'sendOtpBtn', {
+                size: 'invisible',
+                callback: () => {}
+            });
+        }
+        recaptchaVerifier.render();
+    }
+    document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+        const phoneNumber = document.getElementById('phoneNumber').value;
+        if (!phoneNumber) { alert("Enter phone number with country code"); return; }
+        setupRecaptcha();
+        try {
+            confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+            document.getElementById('otpSection').style.display = 'block';
+            alert("OTP sent!");
+        } catch (err) { alert(err.message); }
+    });
+    document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+        const otp = document.getElementById('otpCode').value;
+        if (!otp || !confirmationResult) return;
+        try {
+            await confirmationResult.confirm(otp);
+            closeAuthModal();
+        } catch (err) { alert("Invalid OTP"); }
+    });
+
+    // Logout
+    logoutBtn.addEventListener('click', async () => {
+        await signOut(auth);
+    });
+    loginBtn.addEventListener('click', showAuthModal);
+
+    // ==================== BEAT STORE LOGIC ====================
+    let beats = [], filteredBeats = [];
+    let activeAudio = null, activeBeatId = null, activeInterval = null;
+
+    async function loadBeats() {
+        try {
+            const beatsCol = collection(db, 'beats');
+            const snapshot = await getDocs(beatsCol);
+            beats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            applyFilters();
+        } catch (err) {
+            document.getElementById('loading').innerHTML = 'Error loading beats: ' + err.message;
+        }
+    }
+
+    function applyFilters() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const genreVal = document.getElementById('genreFilter').value;
+        const bpmMin = parseInt(document.getElementById('bpmMin').value);
+        const bpmMax = parseInt(document.getElementById('bpmMax').value);
+        filteredBeats = beats.filter(beat => {
+            if (genreVal && beat.genre !== genreVal) return false;
+            let bpm = parseInt(beat.bpm);
+            if (bpm < bpmMin || bpm > bpmMax) return false;
+            if (searchTerm) {
+                let match = beat.title.toLowerCase().includes(searchTerm) ||
+                            (beat.genre && beat.genre.toLowerCase().includes(searchTerm)) ||
+                            (beat.tags && beat.tags.toLowerCase().includes(searchTerm));
+                if (!match) return false;
+            }
+            return true;
+        });
+        renderStore();
+    }
+
+    function renderStore() {
+        const grid = document.getElementById('beatsGrid');
+        const loadingDiv = document.getElementById('loading');
+        loadingDiv.style.display = 'none';
+        if (!filteredBeats.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">✨ No beats match your filters.</div>';
+            return;
+        }
+        grid.innerHTML = filteredBeats.map(beat => `
+            <div class="beat-card">
+                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img" onerror="this.src='https://placehold.co/600x400/2a2418/white?text=🎵'">` : `<div class="placeholder-cover">🎧</div>`}
+                <div class="p-5">
+                    <div class="flex justify-between items-start gap-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-amber-100">${escapeHtml(beat.title)}</h3>
+                            <div class="flex flex-wrap gap-2 mt-2">
+                                <span class="genre-badge">${escapeHtml(beat.genre)}</span>
+                                <span class="text-sm text-amber-400">${beat.bpm} BPM</span>
+                                ${beat.tags ? beat.tags.split(',').slice(0,2).map(t => `<span class="tag-badge">${escapeHtml(t.trim())}</span>`).join('') : ''}
+                            </div>
+                        </div>
+                        <span class="price">$${beat.price}</span>
+                    </div>
+                    <div class="mt-4">
+                        <button class="preview-btn" data-id="${beat.id}" data-url="${beat.audioUrl}">▶ 30s Preview</button>
+                        <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
+                        <div id="time-${beat.id}" class="time-text">0:00 / 0:30</div>
+                        <div id="error-${beat.id}" class="error-msg hidden" style="color:#f88;"></div>
+                    </div>
+                    <div class="flex gap-2 mt-4">
+                        <button onclick="showDetail('${beat.id}')" class="flex-1 bg-amber-600/20 border border-amber-500 rounded-full py-2 text-sm">Details</button>
+                        ${currentUser ? 
+                            `<button class="buy-now-btn flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold rounded-full py-2 text-sm" data-id="${beat.id}" data-price="${beat.price}" data-title="${beat.title}">Buy Now</button>` :
+                            `<button class="flex-1 bg-gray-700 text-gray-400 rounded-full py-2 text-sm cursor-not-allowed" disabled>Login to Buy</button>`
+                        }
+                    </div>
+                </div>
+            </div>
+        `).join('');
+
+        attachPreviewEvents();
+        if (currentUser) attachBuyEvents();
+    }
+
+    function attachPreviewEvents() {
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.removeEventListener('click', previewHandler);
+            btn.addEventListener('click', previewHandler);
+        });
+    }
+    function previewHandler(e) {
+        const btn = e.currentTarget;
+        const id = btn.getAttribute('data-id');
+        const url = btn.getAttribute('data-url');
+        togglePreview(id, url);
+    }
+    function attachBuyEvents() {
+        document.querySelectorAll('.buy-now-btn').forEach(btn => {
+            btn.removeEventListener('click', buyHandler);
+            btn.addEventListener('click', buyHandler);
+        });
+    }
+    function buyHandler(e) {
+        const btn = e.currentTarget;
+        const beatId = btn.getAttribute('data-id');
+        const price = btn.getAttribute('data-price');
+        const title = btn.getAttribute('data-title');
+        // Redirect to checkout page with beat info
+        window.location.href = `checkout.html?id=${beatId}&price=${price}&title=${encodeURIComponent(title)}`;
+    }
+
+    // Preview logic (same as before, functional)
+    function togglePreview(beatId, audioUrl) {
+        if (activeBeatId === beatId && activeAudio && !activeAudio.paused) { stopPreview(); return; }
+        stopPreview();
+        const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`);
+        const progressFill = document.getElementById(`progress-${beatId}`);
+        const timeDisplay = document.getElementById(`time-${beatId}`);
+        const errorDiv = document.getElementById(`error-${beatId}`);
+        btn.innerHTML = '⏳ Loading...'; btn.disabled = true; errorDiv.classList.add('hidden');
+        const audio = new Audio(); audio.src = audioUrl; audio.crossOrigin = "Anonymous";
+        let maxDuration = 30, interval = null;
+        audio.addEventListener('loadedmetadata', () => {
+            maxDuration = Math.min(audio.duration,30); audio.currentTime = 0;
+            audio.play().then(() => {
+                btn.innerHTML = '⏸ Pause'; btn.disabled = false; btn.classList.add('playing');
+                activeAudio = audio; activeBeatId = beatId;
+                interval = setInterval(() => {
+                    if (audio.paused) { clearInterval(interval); resetPreviewBtn(btn, progressFill, timeDisplay); return; }
+                    if (audio.currentTime >= maxDuration) { audio.pause(); audio.currentTime = 0; clearInterval(interval); resetPreviewBtn(btn, progressFill, timeDisplay); }
+                    else { const percent = (audio.currentTime / maxDuration)*100; progressFill.style.width = percent+'%'; const curSec = Math.floor(audio.currentTime); timeDisplay.textContent = `${Math.floor(curSec/60)}:${(curSec%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDuration)}`; }
+                }, 200);
+            }).catch(() => { btn.innerHTML = '▶ 30s Preview'; btn.disabled = false; errorDiv.textContent = '❌ Cannot play audio.'; errorDiv.classList.remove('hidden'); });
+        });
+        audio.onerror = () => { btn.innerHTML = '▶ 30s Preview'; btn.disabled = false; errorDiv.textContent = '❌ Failed to load audio.'; errorDiv.classList.remove('hidden'); };
+        function resetPreviewBtn(btn, prog, time) { btn.innerHTML = '▶ 30s Preview'; btn.classList.remove('playing'); prog.style.width = '0%'; time.textContent = '0:00 / 0:30'; activeAudio = null; activeBeatId = null; }
+    }
+    function stopPreview() { if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; if(activeInterval) clearInterval(activeInterval); const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`); if(oldBtn){ oldBtn.innerHTML='▶ 30s Preview'; oldBtn.classList.remove('playing'); } const oldProg = document.getElementById(`progress-${activeBeatId}`); if(oldProg) oldProg.style.width='0%'; const oldTime = document.getElementById(`time-${activeBeatId}`); if(oldTime) oldTime.textContent='0:00 / 0:30'; activeAudio=null; activeBeatId=null; } }
+    function showDetail(beatId) { alert("Detail page coming soon. Beat ID: " + beatId); }
+    function resetFilters() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('genreFilter').value = '';
+        document.getElementById('bpmMin').value = '60'; document.getElementById('bpmMinVal').innerText = '60';
+        document.getElementById('bpmMax').value = '180'; document.getElementById('bpmMaxVal').innerText = '180';
+        applyFilters();
+    }
+    document.getElementById('bpmMin').addEventListener('input', (e) => { document.getElementById('bpmMinVal').innerText = e.target.value; applyFilters(); });
+    document.getElementById('bpmMax').addEventListener('input', (e) => { document.getElementById('bpmMaxVal').innerText = e.target.value; applyFilters(); });
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('genreFilter').addEventListener('change', applyFilters);
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+    // Gold canvas background (same as before)
+    const canvas = document.getElementById('gold-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, goldBars = [], particles = [], mouseX=0, mouseY=0, targetX=0, targetY=0;
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    window.addEventListener('resize', () => { resizeCanvas(); initGoldBars(); initParticles(); });
+    window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; mouseX = mouseX*0.95+targetX*0.05; mouseY = mouseY*0.95+targetY*0.05; });
+    class GoldBar { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.w = Math.random()*60+30; this.h = Math.random()*15+8; this.angle = Math.random()*Math.PI*2; this.rotSpeed = (Math.random()-0.5)*0.005; this.moveX = (Math.random()-0.5)*0.3; this.moveY = (Math.random()-0.5)*0.2; this.opacity = Math.random()*0.25+0.1; }
+    update() { let dx = this.x - mouseX, dy = this.y - mouseY, dist = Math.hypot(dx,dy); if(dist<120){ let angle = Math.atan2(dy,dx), force = (120-dist)/120*0.8; this.x += Math.cos(angle)*force; this.y += Math.sin(angle)*force; } this.x += this.moveX; this.y += this.moveY; this.angle += this.rotSpeed; if(this.x<-100) this.x=width+100; if(this.x>width+100) this.x=-100; if(this.y<-100) this.y=height+100; if(this.y>height+100) this.y=-100; }
+    draw() { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle); let grad = ctx.createLinearGradient(-this.w/2,-this.h/2,this.w/2,this.h/2); grad.addColorStop(0,`rgba(212,175,55,${this.opacity*0.8})`); grad.addColorStop(0.5,`rgba(255,215,0,${this.opacity})`); grad.addColorStop(1,`rgba(184,134,11,${this.opacity*0.7})`); ctx.fillStyle=grad; ctx.shadowBlur=12; ctx.shadowColor=`rgba(212,175,55,${this.opacity*0.6})`; ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h); ctx.strokeStyle=`rgba(255,235,140,${this.opacity*0.8})`; ctx.lineWidth=1; ctx.strokeRect(-this.w/2,-this.h/2,this.w,this.h); ctx.restore(); } }
+    class GoldParticle { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.size = Math.random()*2+0.8; this.speedX = (Math.random()-0.5)*0.2; this.speedY = (Math.random()-0.5)*0.15; this.alpha = Math.random()*0.4+0.15; }
+    update() { this.x += this.speedX; this.y += this.speedY; if(this.x<0) this.x=width; if(this.x>width) this.x=0; if(this.y<0) this.y=height; if(this.y>height) this.y=0; }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(255,215,0,${this.alpha})`; ctx.fill(); } }
+    function initGoldBars() { goldBars = []; let barCount = Math.min(35, Math.floor(width/80)); for(let i=0;i<barCount;i++) goldBars.push(new GoldBar()); }
+    function initParticles() { particles = []; let particleCount = Math.min(200, Math.floor(width*height/12000)); for(let i=0;i<particleCount;i++) particles.push(new GoldParticle()); }
+    function drawBackground() { let grad = ctx.createLinearGradient(0,0,width,height); grad.addColorStop(0,'#0a0804'); grad.addColorStop(0.5,'#1c160c'); grad.addColorStop(1,'#0d0a05'); ctx.fillStyle=grad; ctx.fillRect(0,0,width,height); let radGrad = ctx.createRadialGradient(width/2,height/2,50,width/2,height/2,width/1.2); radGrad.addColorStop(0,'rgba(212,175,55,0.05)'); radGrad.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=radGrad; ctx.fillRect(0,0,width,height); }
+    function animate() { if(!ctx) return; drawBackground(); for(let bar of goldBars) { bar.update(); bar.draw(); } for(let p of particles) { p.update(); p.draw(); } requestAnimationFrame(animate); }
+    function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
+    startCanvas();
+
+    // Initial load
+    loadBeats();
+</script>
+</body>
+</html>
