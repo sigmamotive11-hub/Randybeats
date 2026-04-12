@@ -1,1 +1,84 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RANDYBEATS | Premium Beats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0804;
+            color: #f5f0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        #gold-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            display: block;
+        }
+        .glass-card {
+            background: rgba(20, 18, 12, 0.75);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            padding: 2rem;
+        }
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37, #ffd700);
+            color: black;
+            font-weight: bold;
+            padding: 12px 28px;
+            border-radius: 40px;
+            transition: 0.2s;
+            display: inline-block;
+        }
+        .btn-gold:hover { transform: scale(0.98); opacity: 0.9; }
+    </style>
+</head>
+<body>
+<canvas id="gold-canvas"></canvas>
+<div class="max-w-7xl mx-auto px-5 py-12 relative z-10">
+    <div class="flex justify-between items-center mb-12">
+        <h1 class="text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS</h1>
+        <div class="space-x-3">
+            <a href="catalog.html" class="border border-amber-500 rounded-full px-5 py-2 text-sm">Browse Beats</a>
+            <a href="account.html" class="bg-amber-600/30 border border-amber-500 rounded-full px-5 py-2 text-sm">Sign In</a>
+        </div>
+    </div>
+    <div class="glass-card max-w-3xl mx-auto text-center">
+        <h2 class="text-4xl md:text-5xl font-bold mb-4">Premium Instrumentals<br>for Artists</h2>
+        <p class="text-gray-300 text-lg mb-6">Instant WAV download · 30s previews · Secure checkout</p>
+        <a href="catalog.html" class="btn-gold">Explore Beats →</a>
+    </div>
+</div>
+<script>
+    // Gold canvas background (same as before)
+    const canvas = document.getElementById('gold-canvas');
+    const ctx = canvas.getContext('2d');
+    let width, height, goldBars = [], particles = [], mouseX=0, mouseY=0, targetX=0, targetY=0;
+    function resizeCanvas() { width = window.innerWidth; height = window.innerHeight; canvas.width = width; canvas.height = height; }
+    window.addEventListener('resize', () => { resizeCanvas(); initGoldBars(); initParticles(); });
+    window.addEventListener('mousemove', (e) => { targetX = e.clientX; targetY = e.clientY; mouseX = mouseX*0.95+targetX*0.05; mouseY = mouseY*0.95+targetY*0.05; });
+    class GoldBar { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.w = Math.random()*60+30; this.h = Math.random()*15+8; this.angle = Math.random()*Math.PI*2; this.rotSpeed = (Math.random()-0.5)*0.005; this.moveX = (Math.random()-0.5)*0.3; this.moveY = (Math.random()-0.5)*0.2; this.opacity = Math.random()*0.25+0.1; }
+    update() { let dx = this.x - mouseX, dy = this.y - mouseY, dist = Math.hypot(dx,dy); if(dist<120){ let angle = Math.atan2(dy,dx), force = (120-dist)/120*0.8; this.x += Math.cos(angle)*force; this.y += Math.sin(angle)*force; } this.x += this.moveX; this.y += this.moveY; this.angle += this.rotSpeed; if(this.x<-100) this.x=width+100; if(this.x>width+100) this.x=-100; if(this.y<-100) this.y=height+100; if(this.y>height+100) this.y=-100; }
+    draw() { ctx.save(); ctx.translate(this.x,this.y); ctx.rotate(this.angle); let grad = ctx.createLinearGradient(-this.w/2,-this.h/2,this.w/2,this.h/2); grad.addColorStop(0,`rgba(212,175,55,${this.opacity*0.8})`); grad.addColorStop(0.5,`rgba(255,215,0,${this.opacity})`); grad.addColorStop(1,`rgba(184,134,11,${this.opacity*0.7})`); ctx.fillStyle=grad; ctx.shadowBlur=12; ctx.shadowColor=`rgba(212,175,55,${this.opacity*0.6})`; ctx.fillRect(-this.w/2,-this.h/2,this.w,this.h); ctx.strokeStyle=`rgba(255,235,140,${this.opacity*0.8})`; ctx.lineWidth=1; ctx.strokeRect(-this.w/2,-this.h/2,this.w,this.h); ctx.restore(); } }
+    class GoldParticle { constructor() { this.x = Math.random()*width; this.y = Math.random()*height; this.size = Math.random()*2+0.8; this.speedX = (Math.random()-0.5)*0.2; this.speedY = (Math.random()-0.5)*0.15; this.alpha = Math.random()*0.4+0.15; }
+    update() { this.x += this.speedX; this.y += this.speedY; if(this.x<0) this.x=width; if(this.x>width) this.x=0; if(this.y<0) this.y=height; if(this.y>height) this.y=0; }
+    draw() { ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(255,215,0,${this.alpha})`; ctx.fill(); } }
+    function initGoldBars() { goldBars = []; let barCount = Math.min(35, Math.floor(width/80)); for(let i=0;i<barCount;i++) goldBars.push(new GoldBar()); }
+    function initParticles() { particles = []; let particleCount = Math.min(200, Math.floor(width*height/12000)); for(let i=0;i<particleCount;i++) particles.push(new GoldParticle()); }
+    function drawBackground() { let grad = ctx.createLinearGradient(0,0,width,height); grad.addColorStop(0,'#0a0804'); grad.addColorStop(0.5,'#1c160c'); grad.addColorStop(1,'#0d0a05'); ctx.fillStyle=grad; ctx.fillRect(0,0,width,height); let radGrad = ctx.createRadialGradient(width/2,height/2,50,width/2,height/2,width/1.2); radGrad.addColorStop(0,'rgba(212,175,55,0.05)'); radGrad.addColorStop(1,'rgba(0,0,0,0)'); ctx.fillStyle=radGrad; ctx.fillRect(0,0,width,height); }
+    function animate() { if(!ctx) return; drawBackground(); for(let bar of goldBars) { bar.update(); bar.draw(); } for(let p of particles) { p.update(); p.draw(); } requestAnimationFrame(animate); }
+    function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
+    startCanvas();
+</script>
+</body>
+</html>
