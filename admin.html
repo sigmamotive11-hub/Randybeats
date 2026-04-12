@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANDYBEATS - Admin | Gold Edition</title>
+    <title>RANDYBEATS - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -30,78 +30,77 @@
             border-radius: 28px;
             border: 1px solid rgba(212, 175, 55, 0.4);
             box-shadow: 0 20px 35px -15px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
         }
-        input, button {
+        .glass-card:hover { border-color: #d4af37; }
+        input, textarea, select {
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(212, 175, 55, 0.4);
-            border-radius: 40px;
-            padding: 10px 16px;
+            border-radius: 16px;
+            padding: 10px 14px;
             color: #f5f0e0;
             width: 100%;
         }
+        input:focus, textarea:focus { outline: none; border-color: #ffd700; }
         button {
             background: rgba(212, 175, 55, 0.2);
-            cursor: pointer;
+            border: 1px solid #d4af37;
+            border-radius: 40px;
+            padding: 10px 20px;
             font-weight: 600;
+            cursor: pointer;
+            color: #f5e6b0;
         }
         button:hover { background: rgba(212, 175, 55, 0.4); border-color: #ffd700; color: white; }
+        .delete-btn { background: rgba(180, 50, 50, 0.3); border-color: #b8860b; }
+        .delete-btn:hover { background: rgba(200, 60, 60, 0.6); }
+        .upload-zone {
+            border: 2px dashed rgba(212, 175, 55, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .upload-zone:hover { border-color: #ffd700; background: rgba(212, 175, 55, 0.05); }
+        .cover-preview { width: 80px; height: 80px; object-fit: cover; border-radius: 16px; border: 1px solid #d4af37; }
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: #1a150c; }
+        ::-webkit-scrollbar-thumb { background: #d4af37; border-radius: 10px; }
     </style>
 </head>
 <body>
 <canvas id="gold-canvas"></canvas>
-<div class="max-w-7xl mx-auto px-5 py-8 relative z-10">
-    <div id="authContainer" class="flex items-center justify-center min-h-[80vh]"></div>
-    <div id="adminContent" style="display:none;">
-        <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
-            <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
-            <button onclick="logout()" class="admin-logout-btn">🚪 Logout</button>
-        </div>
-        <div class="mb-8">
-            <button onclick="openAddModal()" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
-        </div>
-        <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-    </div>
-</div>
+<div class="max-w-7xl mx-auto px-5 py-8 relative z-10" id="adminContainer"></div>
 
-<!-- Modal (same as before) -->
-<div id="beatModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 p-4">
-    <div class="glass-card max-w-lg w-full p-6">
-        <div class="flex justify-between items-center mb-4">
-            <h2 id="modalTitle" class="text-2xl font-bold text-amber-300">Add New Beat</h2>
-            <button onclick="closeModal()" class="text-gray-400 text-2xl">&times;</button>
-        </div>
-        <form id="beatForm">
-            <input type="hidden" id="beatId">
-            <div class="mb-3"><label class="block text-sm mb-1">Title *</label><input type="text" id="title" required></div>
-            <div class="grid grid-cols-2 gap-3 mb-3">
-                <div><label class="block text-sm mb-1">Genre</label><input type="text" id="genre" placeholder="Trap, Drill..."></div>
-                <div><label class="block text-sm mb-1">BPM</label><input type="number" id="bpm" placeholder="140"></div>
-            </div>
-            <div class="mb-3"><label class="block text-sm mb-1">Tags (comma separated)</label><input type="text" id="tags" placeholder="dark, melodic"></div>
-            <div class="mb-3"><label class="block text-sm mb-1">Price (USD) *</label><input type="number" step="0.01" id="price" required></div>
-            <div class="mb-3"><label class="block text-sm mb-1">Audio URL *</label><input type="url" id="audioUrl" placeholder="https://files.catbox.moe/xxxxx.wav" required></div>
-            <div class="mb-4">
-                <label class="block text-sm mb-1">Cover Art (optional)</label>
-                <div id="coverUploadZone" class="upload-zone" style="border:2px dashed rgba(212,175,55,0.5); border-radius:20px; padding:20px; text-align:center; cursor:pointer;"><input type="file" id="coverFile" accept="image/*" class="hidden"><div id="coverPreview" class="text-center"><div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload</p></div></div>
-                <input type="hidden" id="coverUrl"><div id="uploadStatus" class="text-xs mt-1"></div>
-            </div>
-            <div class="flex gap-3">
-                <button type="submit" class="flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold py-3 rounded-xl">Save Beat</button>
-                <button type="button" onclick="closeModal()" class="px-5 border border-gray-600 rounded-xl">Cancel</button>
-            </div>
-        </form>
-    </div>
-</div>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-<script>
-    // ==================== SIMPLE SHA-256 HASH FUNCTION ====================
-    async function hashPassword(password) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(password);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
+    // ==================== YOUR FIREBASE CONFIG (UPDATED) ====================
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKeXaVaYtcwnrxYQWUYdZVy7yMdgdK7TQ",
+        authDomain: "randybeats-2dfb0.firebaseapp.com",
+        projectId: "randybeats-2dfb0",
+        storageBucket: "randybeats-2dfb0.firebasestorage.app",
+        messagingSenderId: "190194060319",
+        appId: "1:190194060319:web:e4ca35186c0c2edbd1d92a"
+    };
+    // =======================================================================
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // === ADMIN UID (provided by user) ===
+    const ADMIN_UID = "IajG51UNTUOYYvPIlFm5TmdV9Sv2";
+
+    // ImgBB API key
+    const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";
+
+    let beats = [];
+    let currentUser = null;
+    const container = document.getElementById('adminContainer');
 
     // ==================== GOLD CANVAS BACKGROUND ====================
     const canvas = document.getElementById('gold-canvas');
@@ -123,94 +122,217 @@
     function startCanvas() { resizeCanvas(); initGoldBars(); initParticles(); animate(); }
     startCanvas();
 
-    // ==================== ADMIN LOGIC (localStorage password, no visible reset hint) ====================
-    const JSONBIN_BIN_ID = "69d9031f36566621a89b8120";
-    const JSONBIN_API_KEY = "$2a$10$1vAYpinavkrFzHw.xa5ao..1RKHqR9.Pb0cx4ngmXwteD5kTG.dmG";
-    const IMGBB_API_KEY = "03082f5cb5527bff5741a6dc7fe146d1";
-    let beats = [];
-    let isAuthenticated = false;
-
-    async function initAuth() {
-        const storedHash = localStorage.getItem('adminPasswordHash');
-        const container = document.getElementById('authContainer');
-        const adminContent = document.getElementById('adminContent');
-
-        if (!storedHash) {
-            // First time: create password
-            container.innerHTML = `
-                <div class="glass-card p-8 max-w-md w-full text-center">
-                    <h2 class="text-2xl font-bold mb-4">🔐 First Time Setup</h2>
-                    <p class="text-sm text-gray-300 mb-4">Create an admin password. This will be stored only in your browser.</p>
-                    <input type="password" id="newPassword" placeholder="Enter password" class="mb-3">
-                    <input type="password" id="confirmPassword" placeholder="Confirm password" class="mb-4">
-                    <button id="setupBtn" class="w-full bg-amber-600 text-black font-bold py-2 rounded-full">Create Admin Password</button>
-                </div>
-            `;
-            document.getElementById('setupBtn').addEventListener('click', async () => {
-                const pwd = document.getElementById('newPassword').value;
-                const confirm = document.getElementById('confirmPassword').value;
-                if (!pwd) { alert("Please enter a password."); return; }
-                if (pwd !== confirm) { alert("Passwords do not match."); return; }
-                const hash = await hashPassword(pwd);
-                localStorage.setItem('adminPasswordHash', hash);
-                alert("Password created! You are now logged in.");
-                container.style.display = 'none';
-                adminContent.style.display = 'block';
-                isAuthenticated = true;
-                loadBeats();
-            });
-        } else {
-            // Existing hash: ask for password (no note, no reset button)
-            container.innerHTML = `
+    // ==================== ADMIN UI FUNCTIONS ====================
+    function showLogin() {
+        container.innerHTML = `
+            <div class="flex items-center justify-center min-h-[80vh]">
                 <div class="glass-card p-8 max-w-md w-full text-center">
                     <h2 class="text-2xl font-bold mb-4">🔐 Admin Login</h2>
-                    <input type="password" id="loginPassword" placeholder="Enter your password" class="mb-4">
-                    <button id="loginBtn" class="w-full bg-amber-600 text-black font-bold py-2 rounded-full">Login</button>
+                    <input type="email" id="adminEmail" placeholder="Email" class="w-full mb-3">
+                    <input type="password" id="adminPassword" placeholder="Password" class="w-full mb-4">
+                    <button id="adminLoginBtn" class="w-full bg-amber-600 text-black font-bold py-2 rounded-full">Login</button>
                 </div>
-            `;
-            document.getElementById('loginBtn').addEventListener('click', async () => {
-                const pwd = document.getElementById('loginPassword').value;
-                const hash = await hashPassword(pwd);
-                if (hash === storedHash) {
-                    container.style.display = 'none';
-                    adminContent.style.display = 'block';
-                    isAuthenticated = true;
-                    loadBeats();
-                } else {
-                    alert("Wrong password.");
-                }
-            });
+            </div>
+        `;
+        document.getElementById('adminLoginBtn').addEventListener('click', async () => {
+            const email = document.getElementById('adminEmail').value;
+            const password = document.getElementById('adminPassword').value;
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                alert("Login failed: " + err.message);
+            }
+        });
+    }
+
+    function showAccessDenied() {
+        container.innerHTML = `
+            <div class="flex items-center justify-center min-h-[80vh]">
+                <div class="glass-card p-8 max-w-md w-full text-center">
+                    <h2 class="text-2xl font-bold mb-4">⛔ Access Denied</h2>
+                    <p>You do not have permission to access this admin area.</p>
+                    <button onclick="signOut(auth)" class="mt-4 bg-amber-600 px-4 py-2 rounded-full">Logout</button>
+                </div>
+            </div>
+        `;
+    }
+
+    async function loadBeats() {
+        const snapshot = await getDocs(collection(db, 'beats'));
+        beats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        renderAdminPanel();
+    }
+
+    async function saveBeat(beatData, beatId = null) {
+        if (beatId) {
+            const beatRef = doc(db, 'beats', beatId);
+            await updateDoc(beatRef, beatData);
+        } else {
+            await addDoc(collection(db, 'beats'), beatData);
+        }
+        await loadBeats();
+    }
+
+    async function deleteBeat(beatId) {
+        if (confirm('Delete this beat permanently?')) {
+            await deleteDoc(doc(db, 'beats', beatId));
+            await loadBeats();
         }
     }
 
-    async function loadBeats() { if(!isAuthenticated) return; const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, { headers: { 'X-Master-Key': JSONBIN_API_KEY } }); const data = await res.json(); beats = data.record || []; renderBeats(); }
-    async function saveBeats() { await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_API_KEY }, body: JSON.stringify(beats) }); }
-    function renderBeats() {
+    async function uploadCover(file) {
+        const fd = new FormData();
+        fd.append('image', file);
+        fd.append('key', IMGBB_API_KEY);
+        const res = await fetch('https://api.imgbb.com/1/upload', { method: 'POST', body: fd });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.error?.message);
+        return data.data.url;
+    }
+
+    function renderAdminPanel() {
+        container.innerHTML = `
+            <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
+                <h1 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS · ADMIN</h1>
+                <button id="logoutBtn" class="admin-logout-btn">🚪 Logout</button>
+            </div>
+            <div class="mb-8">
+                <button id="addBeatBtn" class="bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold px-6 py-3 rounded-full shadow-lg">+ Add New Beat</button>
+            </div>
+            <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        `;
+        document.getElementById('addBeatBtn').addEventListener('click', () => openBeatModal());
+        document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+
         const grid = document.getElementById('beatsGrid');
-        if (!beats.length) { grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">No beats yet. Click "+ Add New Beat" to start.</div>'; return; }
+        if (!beats.length) {
+            grid.innerHTML = '<div class="col-span-full text-center text-amber-400/60 py-16">No beats yet. Click "+ Add New Beat" to start.</div>';
+            return;
+        }
         grid.innerHTML = beats.map(beat => `
             <div class="glass-card p-4">
                 <div class="flex gap-3">
                     ${beat.coverArt ? `<img src="${beat.coverArt}" class="w-16 h-16 rounded-xl object-cover border border-amber-500">` : `<div class="w-16 h-16 bg-black/50 rounded-xl flex items-center justify-center text-2xl">🎧</div>`}
-                    <div class="flex-1"><h3 class="font-bold text-lg text-amber-100">${escapeHtml(beat.title)}</h3><p class="text-sm text-amber-400">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p><p class="text-yellow-400 font-bold">$${beat.price}</p>${beat.tags ? `<p class="text-xs text-gray-400">${escapeHtml(beat.tags)}</p>` : ''}</div>
+                    <div class="flex-1">
+                        <h3 class="font-bold text-lg text-amber-100">${escapeHtml(beat.title)}</h3>
+                        <p class="text-sm text-amber-400">${escapeHtml(beat.genre)} • ${beat.bpm} BPM</p>
+                        <p class="text-yellow-400 font-bold">$${beat.price}</p>
+                        ${beat.tags ? `<p class="text-xs text-gray-400">${escapeHtml(beat.tags)}</p>` : ''}
+                    </div>
                 </div>
-                <div class="flex gap-2 mt-3"><button onclick="editBeat('${beat.id}')" class="flex-1 bg-amber-600/20 hover:bg-amber-600/40 py-2 rounded-lg text-sm">Edit</button><button onclick="deleteBeat('${beat.id}')" class="flex-1 delete-btn py-2 rounded-lg text-sm">Delete</button></div>
+                <div class="flex gap-2 mt-3">
+                    <button class="edit-beat-btn flex-1 bg-amber-600/20 hover:bg-amber-600/40 py-2 rounded-lg text-sm" data-id="${beat.id}">Edit</button>
+                    <button class="delete-beat-btn flex-1 delete-btn py-2 rounded-lg text-sm" data-id="${beat.id}">Delete</button>
+                </div>
             </div>
         `).join('');
-    }
-    window.editBeat = (id) => { const beat = beats.find(b=>b.id===id); if(!beat) return; document.getElementById('modalTitle').innerText='Edit Beat'; document.getElementById('beatId').value=beat.id; document.getElementById('title').value=beat.title; document.getElementById('genre').value=beat.genre||''; document.getElementById('bpm').value=beat.bpm; document.getElementById('price').value=beat.price; document.getElementById('audioUrl').value=beat.audioUrl; document.getElementById('tags').value=beat.tags||''; document.getElementById('coverUrl').value=beat.coverArt||''; if(beat.coverArt) document.getElementById('coverPreview').innerHTML=`<img src="${beat.coverArt}" class="w-20 h-20 object-cover rounded-lg mx-auto"><p class="text-xs mt-1 text-amber-300">Current cover</p>`; else document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; openModal(); };
-    window.deleteBeat = async (id) => { if(confirm('Delete this beat?')) { beats = beats.filter(b=>b.id!==id); await saveBeats(); renderBeats(); } };
-    async function uploadCover(file) { const fd = new FormData(); fd.append('image',file); fd.append('key',IMGBB_API_KEY); const res = await fetch('https://api.imgbb.com/1/upload',{method:'POST',body:fd}); const data = await res.json(); if(!data.success) throw new Error(data.error?.message); return data.data.url; }
-    document.getElementById('coverUploadZone').addEventListener('click',()=>document.getElementById('coverFile').click());
-    document.getElementById('coverFile').addEventListener('change',async(e)=>{ const file=e.target.files[0]; if(!file) return; const status=document.getElementById('uploadStatus'); status.innerText='Uploading...'; try{ const url=await uploadCover(file); document.getElementById('coverUrl').value=url; document.getElementById('coverPreview').innerHTML=`<img src="${url}" class="w-20 h-20 object-cover rounded-lg mx-auto"><p class="text-xs mt-1 text-green-400">✓ Uploaded</p>`; status.innerText=''; } catch(err){ status.innerText='Upload failed'; } });
-    document.getElementById('beatForm').addEventListener('submit', async(e)=>{ e.preventDefault(); const id = document.getElementById('beatId').value || Date.now().toString(); const title = document.getElementById('title').value.trim(); if(!title) return alert('Title required'); const audioUrl = document.getElementById('audioUrl').value.trim(); if(!audioUrl) return alert('Audio URL required'); const newBeat = { id, title, genre: document.getElementById('genre').value.trim()||'Instrumental', bpm: document.getElementById('bpm').value||'140', price: parseFloat(document.getElementById('price').value).toFixed(2), audioUrl, coverArt: document.getElementById('coverUrl').value||'', tags: document.getElementById('tags').value.trim()||'' }; const idx = beats.findIndex(b=>b.id===id); if(idx!==-1) beats[idx]=newBeat; else beats.push(newBeat); await saveBeats(); renderBeats(); closeModal(); alert('Beat saved!'); });
-    function openAddModal() { document.getElementById('modalTitle').innerText='Add New Beat'; document.getElementById('beatForm').reset(); document.getElementById('beatId').value=''; document.getElementById('coverUrl').value=''; document.getElementById('coverPreview').innerHTML='<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload cover image</p>'; document.getElementById('uploadStatus').innerText=''; openModal(); }
-    function openModal() { document.getElementById('beatModal').classList.remove('hidden'); document.getElementById('beatModal').classList.add('flex'); }
-    function closeModal() { document.getElementById('beatModal').classList.add('hidden'); }
-    function logout() { localStorage.removeItem('adminPasswordHash'); location.reload(); }
-    function escapeHtml(str) { return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
 
-    initAuth();
+        document.querySelectorAll('.edit-beat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                const beat = beats.find(b => b.id === id);
+                if (beat) openBeatModal(beat);
+            });
+        });
+        document.querySelectorAll('.delete-beat-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                deleteBeat(id);
+            });
+        });
+    }
+
+    function openBeatModal(beat = null) {
+        const modal = document.createElement('div');
+        modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4';
+        modal.innerHTML = `
+            <div class="glass-card max-w-lg w-full p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-bold text-amber-300">${beat ? 'Edit Beat' : 'Add New Beat'}</h2>
+                    <button class="close-modal text-gray-400 text-2xl">&times;</button>
+                </div>
+                <form id="adminBeatForm">
+                    <input type="hidden" id="beatId" value="${beat ? beat.id : ''}">
+                    <div class="mb-3"><label class="block text-sm mb-1">Title *</label><input type="text" id="title" value="${beat ? escapeHtml(beat.title) : ''}" required></div>
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <div><label class="block text-sm mb-1">Genre</label><input type="text" id="genre" value="${beat ? escapeHtml(beat.genre) : ''}" placeholder="Trap, Drill..."></div>
+                        <div><label class="block text-sm mb-1">BPM</label><input type="number" id="bpm" value="${beat ? beat.bpm : ''}" placeholder="140"></div>
+                    </div>
+                    <div class="mb-3"><label class="block text-sm mb-1">Tags (comma separated)</label><input type="text" id="tags" value="${beat ? escapeHtml(beat.tags) : ''}" placeholder="dark, melodic"></div>
+                    <div class="mb-3"><label class="block text-sm mb-1">Price (USD) *</label><input type="number" step="0.01" id="price" value="${beat ? beat.price : ''}" required></div>
+                    <div class="mb-3"><label class="block text-sm mb-1">Audio URL *</label><input type="url" id="audioUrl" value="${beat ? beat.audioUrl : ''}" placeholder="https://files.catbox.moe/xxxxx.wav" required></div>
+                    <div class="mb-4">
+                        <label class="block text-sm mb-1">Cover Art (optional)</label>
+                        <div id="coverUploadZone" class="upload-zone"><input type="file" id="coverFile" accept="image/*" class="hidden"><div id="coverPreview" class="text-center">${beat && beat.coverArt ? `<img src="${beat.coverArt}" class="cover-preview mx-auto"><p class="text-xs mt-1">Current cover</p>` : '<div class="text-3xl mb-1">🖼️</div><p class="text-sm">Click to upload</p>'}</div></div>
+                        <input type="hidden" id="coverUrl" value="${beat ? beat.coverArt : ''}">
+                        <div id="uploadStatus" class="text-xs mt-1"></div>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="submit" class="flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold py-3 rounded-xl">Save Beat</button>
+                        <button type="button" class="cancel-modal px-5 border border-gray-600 rounded-xl">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeModal = () => modal.remove();
+        modal.querySelector('.close-modal').addEventListener('click', closeModal);
+        modal.querySelector('.cancel-modal').addEventListener('click', closeModal);
+
+        const uploadZone = modal.querySelector('#coverUploadZone');
+        const coverFile = modal.querySelector('#coverFile');
+        const coverPreview = modal.querySelector('#coverPreview');
+        const coverUrlInput = modal.querySelector('#coverUrl');
+        const statusDiv = modal.querySelector('#uploadStatus');
+
+        uploadZone.addEventListener('click', () => coverFile.click());
+        coverFile.addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            statusDiv.innerText = 'Uploading...';
+            try {
+                const url = await uploadCover(file);
+                coverUrlInput.value = url;
+                coverPreview.innerHTML = `<img src="${url}" class="cover-preview mx-auto"><p class="text-xs mt-1 text-green-400">✓ Uploaded</p>`;
+                statusDiv.innerText = '';
+            } catch (err) {
+                statusDiv.innerText = 'Upload failed';
+            }
+        });
+
+        modal.querySelector('#adminBeatForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const beatId = modal.querySelector('#beatId').value;
+            const beatData = {
+                title: modal.querySelector('#title').value.trim(),
+                genre: modal.querySelector('#genre').value.trim() || 'Instrumental',
+                bpm: modal.querySelector('#bpm').value || '140',
+                price: parseFloat(modal.querySelector('#price').value).toFixed(2),
+                audioUrl: modal.querySelector('#audioUrl').value.trim(),
+                coverArt: modal.querySelector('#coverUrl').value || '',
+                tags: modal.querySelector('#tags').value.trim() || ''
+            };
+            if (!beatData.title) { alert('Title required'); return; }
+            if (!beatData.audioUrl) { alert('Audio URL required'); return; }
+            await saveBeat(beatData, beatId || null);
+            closeModal();
+        });
+    }
+
+    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+
+    // ==================== AUTH STATE LISTENER ====================
+    onAuthStateChanged(auth, async (user) => {
+        currentUser = user;
+        if (user && user.uid === ADMIN_UID) {
+            await loadBeats();
+        } else if (user) {
+            showAccessDenied();
+        } else {
+            showLogin();
+        }
+    });
 </script>
 </body>
 </html>
