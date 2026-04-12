@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RANDYBEATS | Premium Beats</title>
+    <title>RANDYBEATS | Scroll Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AdA9_iV1iAS2sxMJZCT3-Bx1xpdF5U7N2oQalAkZnCjX7BtlAdfpfDl3KHuvW9gQkUeGHoaO0vMcYm11&currency=USD"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -12,8 +13,7 @@
             font-family: 'Inter', sans-serif;
             background: #0a0804;
             color: #f5f0e0;
-            min-height: 100vh;
-            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
         #gold-canvas {
             position: fixed;
@@ -23,6 +23,14 @@
             height: 100%;
             z-index: -1;
             display: block;
+        }
+        section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4rem 1.5rem;
+            border-bottom: 1px solid rgba(212,175,55,0.15);
         }
         .glass-card {
             background: rgba(20, 18, 12, 0.75);
@@ -35,32 +43,298 @@
             background: linear-gradient(135deg, #d4af37, #ffd700);
             color: black;
             font-weight: bold;
-            padding: 12px 28px;
+            padding: 10px 24px;
             border-radius: 40px;
-            transition: 0.2s;
             display: inline-block;
+            cursor: pointer;
+            text-align: center;
         }
-        .btn-gold:hover { transform: scale(0.98); opacity: 0.9; }
+        .preview-btn {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.6);
+            border-radius: 60px;
+            padding: 8px 0;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .beat-card {
+            background: rgba(20,18,12,0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 24px;
+            border: 1px solid rgba(212,175,55,0.3);
+            overflow: hidden;
+            transition: 0.3s;
+        }
+        .beat-card:hover { transform: translateY(-4px); border-color: #d4af37; }
+        .cover-img { width: 100%; height: 180px; object-fit: cover; }
+        .progress-bar { width: 100%; height: 3px; background: #2a2418; margin: 8px 0; border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #d4af37, #ffd700); width: 0%; }
+        .hidden-section { display: none; }
+        input, select {
+            background: rgba(0,0,0,0.5);
+            border: 1px solid rgba(212,175,55,0.4);
+            border-radius: 40px;
+            padding: 8px 16px;
+            color: white;
+            width: 100%;
+        }
+        .auth-tab { display: inline-block; padding: 6px 16px; border-radius: 40px; background: rgba(255,255,255,0.1); cursor: pointer; }
+        .auth-tab.active { background: #d4af37; color: black; }
     </style>
 </head>
 <body>
 <canvas id="gold-canvas"></canvas>
-<div class="max-w-7xl mx-auto px-5 py-12 relative z-10">
-    <div class="flex justify-between items-center mb-12">
-        <h1 class="text-5xl font-extrabold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS</h1>
-        <div class="space-x-3">
-            <a href="catalog.html" class="border border-amber-500 rounded-full px-5 py-2 text-sm">Browse Beats</a>
-            <a href="account.html" class="bg-amber-600/30 border border-amber-500 rounded-full px-5 py-2 text-sm">Sign In</a>
+
+<!-- LANDING SECTION -->
+<section id="landingSection">
+    <div class="max-w-4xl mx-auto text-center glass-card">
+        <h1 class="text-5xl md:text-6xl font-bold bg-gradient-to-r from-yellow-400 to-amber-500 bg-clip-text text-transparent">RANDYBEATS</h1>
+        <p class="text-gray-300 text-lg mt-4">Premium instrumentals for artists. 30‑second previews. Instant WAV download.</p>
+        <div class="mt-8 space-x-4">
+            <button onclick="scrollToCatalog()" class="btn-gold">Browse Beats</button>
+            <a href="admin.html" class="border border-amber-500 rounded-full px-5 py-2 text-sm inline-block">Admin</a>
         </div>
     </div>
-    <div class="glass-card max-w-3xl mx-auto text-center">
-        <h2 class="text-4xl md:text-5xl font-bold mb-4">Premium Instrumentals<br>for Artists</h2>
-        <p class="text-gray-300 text-lg mb-6">Instant WAV download · 30s previews · Secure checkout</p>
-        <a href="catalog.html" class="btn-gold">Explore Beats →</a>
+</section>
+
+<!-- CATALOG SECTION -->
+<section id="catalogSection">
+    <div class="max-w-7xl mx-auto w-full">
+        <h2 class="text-3xl font-bold text-center mb-6">All Beats</h2>
+        <!-- Filters -->
+        <div class="glass-card mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <input type="text" id="searchInput" placeholder="Search title, genre, tags...">
+                <select id="genreFilter"><option value="">All Genres</option><option>Trap</option><option>Drill</option><option>RnB</option><option>Lo-fi</option><option>Pop</option></select>
+                <div class="flex gap-2 items-center"><span class="text-sm">BPM:</span><input type="range" id="bpmMin" min="60" max="180" value="60"><span id="bpmMinVal">60</span><span>-</span><input type="range" id="bpmMax" min="60" max="180" value="180"><span id="bpmMaxVal">180</span></div>
+                <button onclick="resetFilters()" class="bg-amber-600/30 border border-amber-500 rounded-full py-2">Reset</button>
+            </div>
+        </div>
+        <!-- Beats Grid -->
+        <div id="beatsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+        <div id="loading" class="text-center py-12">Loading beats...</div>
     </div>
-</div>
-<script>
-    // Gold canvas background (same as before)
+</section>
+
+<!-- BEAT DETAIL SECTION (hidden initially) -->
+<section id="beatDetailSection" class="hidden-section">
+    <div class="max-w-4xl mx-auto w-full glass-card">
+        <button onclick="hideBeatDetail()" class="text-amber-400 mb-4 block">← Back to Catalog</button>
+        <div id="beatDetailContent"></div>
+    </div>
+</section>
+
+<!-- ACCOUNT SECTION (hidden initially) -->
+<section id="accountSection" class="hidden-section">
+    <div class="max-w-md mx-auto w-full glass-card">
+        <h2 class="text-2xl font-bold text-center mb-4">Account Access</h2>
+        <div class="flex gap-2 justify-center mb-4">
+            <button class="auth-tab active" data-tab="login">Sign In</button>
+            <button class="auth-tab" data-tab="signup">Sign Up</button>
+        </div>
+        <div id="loginTab">
+            <input type="email" id="loginEmail" placeholder="Email" class="mb-3">
+            <input type="password" id="loginPassword" placeholder="Password" class="mb-4">
+            <button id="emailLoginBtn" class="btn-gold w-full mb-3">Sign In with Email</button>
+            <button id="googleLoginBtn" class="w-full bg-white/10 border border-white/20 py-2 rounded-full mb-2">Sign In with Google</button>
+            <div class="relative my-3"><div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-600"></div></div><div class="relative flex justify-center text-xs"><span class="bg-black/50 px-2">OR</span></div></div>
+            <div class="flex gap-2"><input type="tel" id="phoneNumber" placeholder="+1234567890" class="flex-1"><button id="sendOtpBtn" class="bg-amber-600 px-4 rounded-full">Send OTP</button></div>
+            <div id="otpSection" style="display:none;" class="mt-3"><input type="text" id="otpCode" placeholder="6-digit code" class="mb-2"><button id="verifyOtpBtn" class="w-full bg-amber-600 py-2 rounded-full">Verify</button></div>
+        </div>
+        <div id="signupTab" style="display:none;">
+            <input type="email" id="signupEmail" placeholder="Email" class="mb-3">
+            <input type="password" id="signupPassword" placeholder="Password" class="mb-4">
+            <button id="emailSignupBtn" class="btn-gold w-full">Create Account</button>
+        </div>
+    </div>
+</section>
+
+<!-- CHECKOUT SECTION (hidden initially) -->
+<section id="checkoutSection" class="hidden-section">
+    <div class="max-w-lg mx-auto w-full glass-card text-center">
+        <button onclick="hideCheckout()" class="text-amber-400 mb-4 block text-left">← Back</button>
+        <div id="checkoutContent"></div>
+    </div>
+</section>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDKeXaVaYtcwnrxYQWUYdZVy7yMdgdK7TQ",
+        authDomain: "randybeats-2dfb0.firebaseapp.com",
+        projectId: "randybeats-2dfb0",
+        storageBucket: "randybeats-2dfb0.firebasestorage.app",
+        messagingSenderId: "190194060319",
+        appId: "1:190194060319:web:e4ca35186c0c2edbd1d92a"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const googleProvider = new GoogleAuthProvider();
+
+    let beats = [], filteredBeats = [];
+    let activeAudio = null, activeInterval = null, activeBeatId = null;
+    let currentUser = null;
+    let selectedBeat = null;
+
+    // DOM elements
+    const beatsGrid = document.getElementById('beatsGrid');
+    const loadingDiv = document.getElementById('loading');
+    const catalogSection = document.getElementById('catalogSection');
+    const beatDetailSection = document.getElementById('beatDetailSection');
+    const accountSection = document.getElementById('accountSection');
+    const checkoutSection = document.getElementById('checkoutSection');
+
+    // Navigation
+    window.scrollToCatalog = () => catalogSection.scrollIntoView({ behavior: 'smooth' });
+    function showBeatDetail(beat) {
+        selectedBeat = beat;
+        renderBeatDetail(beat);
+        catalogSection.style.display = 'none';
+        beatDetailSection.classList.remove('hidden-section');
+        beatDetailSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    window.hideBeatDetail = () => {
+        beatDetailSection.classList.add('hidden-section');
+        catalogSection.style.display = 'flex';
+        catalogSection.scrollIntoView({ behavior: 'smooth' });
+    };
+    function showAccount() {
+        accountSection.classList.remove('hidden-section');
+        accountSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    function hideAccount() { accountSection.classList.add('hidden-section'); }
+    function showCheckout(beat) {
+        selectedBeat = beat;
+        renderCheckout(beat);
+        checkoutSection.classList.remove('hidden-section');
+        checkoutSection.scrollIntoView({ behavior: 'smooth' });
+    }
+    window.hideCheckout = () => {
+        checkoutSection.classList.add('hidden-section');
+    };
+
+    // Auth UI
+    onAuthStateChanged(auth, (user) => {
+        currentUser = user;
+        if (user && accountSection.classList.contains('hidden-section') === false) {
+            hideAccount();
+            if (selectedBeat) showCheckout(selectedBeat);
+        }
+    });
+
+    // Tab switching for account
+    document.querySelectorAll('.auth-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
+            document.getElementById('loginTab').style.display = target === 'login' ? 'block' : 'none';
+            document.getElementById('signupTab').style.display = target === 'signup' ? 'block' : 'none';
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+    document.getElementById('emailSignupBtn').addEventListener('click', async () => {
+        const email = document.getElementById('signupEmail').value;
+        const pwd = document.getElementById('signupPassword').value;
+        try { await createUserWithEmailAndPassword(auth, email, pwd); alert("Account created!"); } catch(err) { alert(err.message); }
+    });
+    document.getElementById('emailLoginBtn').addEventListener('click', async () => {
+        const email = document.getElementById('loginEmail').value;
+        const pwd = document.getElementById('loginPassword').value;
+        try { await signInWithEmailAndPassword(auth, email, pwd); } catch(err) { alert(err.message); }
+    });
+    document.getElementById('googleLoginBtn').addEventListener('click', async () => {
+        try { await signInWithPopup(auth, googleProvider); } catch(err) { alert(err.message); }
+    });
+    let recaptchaVerifier = null, confirmationResult = null;
+    function setupRecaptcha() { if (!recaptchaVerifier) recaptchaVerifier = new RecaptchaVerifier(auth, 'sendOtpBtn', { size: 'invisible', callback: () => {} }); recaptchaVerifier.render(); }
+    document.getElementById('sendOtpBtn').addEventListener('click', async () => {
+        const phone = document.getElementById('phoneNumber').value;
+        if (!phone) return alert("Enter phone number");
+        setupRecaptcha();
+        try {
+            confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+            document.getElementById('otpSection').style.display = 'block';
+            alert("OTP sent");
+        } catch(err) { alert(err.message); }
+    });
+    document.getElementById('verifyOtpBtn').addEventListener('click', async () => {
+        const otp = document.getElementById('otpCode').value;
+        if (!otp || !confirmationResult) return;
+        try { await confirmationResult.confirm(otp); } catch(err) { alert("Invalid OTP"); }
+    });
+
+    // Beats
+    async function loadBeats() {
+        const snapshot = await getDocs(collection(db, 'beats'));
+        beats = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        applyFilters();
+    }
+    function applyFilters() {
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        const genre = document.getElementById('genreFilter').value;
+        const bpmMin = parseInt(document.getElementById('bpmMin').value);
+        const bpmMax = parseInt(document.getElementById('bpmMax').value);
+        filteredBeats = beats.filter(b => {
+            if (genre && b.genre !== genre) return false;
+            let bpm = parseInt(b.bpm);
+            if (bpm < bpmMin || bpm > bpmMax) return false;
+            if (search && !b.title.toLowerCase().includes(search) && !(b.genre && b.genre.toLowerCase().includes(search)) && !(b.tags && b.tags.toLowerCase().includes(search))) return false;
+            return true;
+        });
+        renderCatalog();
+    }
+    function renderCatalog() {
+        loadingDiv.style.display = 'none';
+        if (!filteredBeats.length) { beatsGrid.innerHTML = '<div class="col-span-full text-center py-12">No beats match.</div>'; return; }
+        beatsGrid.innerHTML = filteredBeats.map(beat => `
+            <div class="beat-card p-4">
+                ${beat.coverArt ? `<img src="${beat.coverArt}" class="cover-img rounded-xl mb-3">` : `<div class="cover-img bg-gray-800 flex items-center justify-center text-3xl mb-3">🎧</div>`}
+                <div class="flex justify-between"><div><h3 class="font-bold">${escapeHtml(beat.title)}</h3><p class="text-sm text-amber-400">${beat.genre} • ${beat.bpm} BPM</p></div><span class="text-yellow-400 font-bold">$${beat.price}</span></div>
+                <button class="preview-btn mt-3" data-id="${beat.id}" data-url="${beat.audioUrl}">▶ 30s Preview</button>
+                <div class="progress-bar"><div id="progress-${beat.id}" class="progress-fill"></div></div>
+                <div id="time-${beat.id}" class="text-right text-xs text-amber-400">0:00 / 0:30</div>
+                <div class="flex gap-2 mt-3"><button onclick='showDetail(${JSON.stringify(beat)})' class="flex-1 bg-amber-600/20 border border-amber-500 rounded-full py-1 text-sm">Details</button><button class="buy-now-btn flex-1 bg-gradient-to-r from-amber-600 to-yellow-600 text-black font-bold rounded-full py-1 text-sm" data-beat='${JSON.stringify(beat)}'>Buy Now</button></div>
+            </div>
+        `).join('');
+        attachPreviewEvents();
+        attachBuyEvents();
+    }
+    window.showDetail = (beat) => showBeatDetail(beat);
+    function attachPreviewEvents() { document.querySelectorAll('.preview-btn').forEach(btn => btn.addEventListener('click', (e) => { const id = btn.dataset.id, url = btn.dataset.url; togglePreview(id, url); })); }
+    function attachBuyEvents() { document.querySelectorAll('.buy-now-btn').forEach(btn => btn.addEventListener('click', () => { const beat = JSON.parse(btn.dataset.beat); if (!currentUser) { showAccount(); } else { showCheckout(beat); } })); }
+    function togglePreview(beatId, url) { /* same preview logic as before – working */ if (activeAudio && activeAudio._beatId === beatId && !activeAudio.paused) { stopPreview(); return; } stopPreview(); const btn = document.querySelector(`.preview-btn[data-id="${beatId}"]`); const prog = document.getElementById(`progress-${beatId}`); const time = document.getElementById(`time-${beatId}`); btn.disabled = true; btn.textContent = 'Loading...'; const audio = new Audio(); audio.src = url; audio._beatId = beatId; let maxDur = 30, interval; audio.addEventListener('loadedmetadata', () => { maxDur = Math.min(audio.duration,30); audio.currentTime = 0; audio.play().then(() => { btn.textContent = 'Pause'; btn.disabled = false; btn.classList.add('playing'); activeAudio = audio; activeBeatId = beatId; interval = setInterval(() => { if (audio.paused) { clearInterval(interval); reset(); return; } if (audio.currentTime >= maxDur) { audio.pause(); audio.currentTime = 0; clearInterval(interval); reset(); } else { prog.style.width = (audio.currentTime/maxDur)*100+'%'; const cs = Math.floor(audio.currentTime); time.textContent = `${Math.floor(cs/60)}:${(cs%60).toString().padStart(2,'0')} / 0:${Math.floor(maxDur)}`; } }, 200); }).catch(() => reset()); }); audio.onerror = () => reset(); function reset() { btn.textContent = '▶ 30s Preview'; btn.disabled = false; btn.classList.remove('playing'); prog.style.width = '0%'; time.textContent = '0:00 / 0:30'; activeAudio = null; activeBeatId = null; } }
+    function stopPreview() { if (activeAudio) { activeAudio.pause(); activeAudio.currentTime = 0; if (activeInterval) clearInterval(activeInterval); const oldBtn = document.querySelector(`.preview-btn[data-id="${activeBeatId}"]`); if (oldBtn) { oldBtn.textContent = '▶ 30s Preview'; oldBtn.classList.remove('playing'); } const oldProg = document.getElementById(`progress-${activeBeatId}`); if (oldProg) oldProg.style.width = '0%'; const oldTime = document.getElementById(`time-${activeBeatId}`); if (oldTime) oldTime.textContent = '0:00 / 0:30'; activeAudio = null; activeBeatId = null; } }
+
+    function renderBeatDetail(beat) {
+        const container = document.getElementById('beatDetailContent');
+        container.innerHTML = `
+            <div class="flex flex-col md:flex-row gap-6">
+                <div class="md:w-1/2">${beat.coverArt ? `<img src="${beat.coverArt}" class="w-full rounded-2xl border border-amber-500">` : `<div class="w-full aspect-square bg-gray-800 rounded-2xl flex items-center justify-center text-5xl">🎧</div>`}</div>
+                <div class="md:w-1/2"><h1 class="text-3xl font-bold">${escapeHtml(beat.title)}</h1><p class="text-amber-400 mt-1">${beat.genre} • ${beat.bpm} BPM</p><p class="text-2xl font-bold text-yellow-400 mt-2">$${beat.price}</p><p class="text-gray-300 mt-4">${beat.tags ? `Tags: ${beat.tags}` : ''}</p><button id="detailBuyBtn" class="btn-gold w-full mt-6">Buy Now</button></div>
+            </div>
+        `;
+        document.getElementById('detailBuyBtn').addEventListener('click', () => { if (!currentUser) showAccount(); else showCheckout(beat); });
+    }
+    function renderCheckout(beat) {
+        const container = document.getElementById('checkoutContent');
+        container.innerHTML = `<h2 class="text-2xl font-bold">Checkout</h2><p class="text-xl mt-2">${beat.title} – $${beat.price}</p><div id="paypal-button"></div><p class="text-xs text-gray-400 mt-4">You will receive the WAV file at ${currentUser?.email}</p>`;
+        if (window.paypal) paypal.Buttons({ createOrder: (data, actions) => actions.order.create({ purchase_units: [{ amount: { value: beat.price, currency: "USD" }, description: beat.title }] }), onApprove: (data, actions) => actions.order.capture().then(() => { alert("Purchase complete! Check your email."); window.location.reload(); }) }).render('#paypal-button');
+    }
+    function resetFilters() { document.getElementById('searchInput').value=''; document.getElementById('genreFilter').value=''; document.getElementById('bpmMin').value='60'; document.getElementById('bpmMax').value='180'; document.getElementById('bpmMinVal').innerText='60'; document.getElementById('bpmMaxVal').innerText='180'; applyFilters(); }
+    document.getElementById('bpmMin').addEventListener('input', (e)=>{ document.getElementById('bpmMinVal').innerText=e.target.value; applyFilters(); });
+    document.getElementById('bpmMax').addEventListener('input', (e)=>{ document.getElementById('bpmMaxVal').innerText=e.target.value; applyFilters(); });
+    document.getElementById('searchInput').addEventListener('input', applyFilters);
+    document.getElementById('genreFilter').addEventListener('change', applyFilters);
+    function escapeHtml(str) { return str.replace(/[&<>]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m])); }
+    loadBeats();
+
+    // Gold canvas (same as before, abbreviated for length)
     const canvas = document.getElementById('gold-canvas');
     const ctx = canvas.getContext('2d');
     let width, height, goldBars = [], particles = [], mouseX=0, mouseY=0, targetX=0, targetY=0;
